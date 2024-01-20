@@ -1,6 +1,4 @@
-# FROM nvcr.io/nvidia/pytorch:22.12-py3
-FROM pytorch/pytorch
-
+# FROM nvcr.io/nvidia/pytorch:22.12-py3#
 RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib/libcudart.so' >> ~/.bashrc 
 
 RUN /opt/conda/bin/pip install bitsandbytes 
@@ -15,4 +13,24 @@ RUN /opt/conda/bin/pip install -U jupyterlab
 RUN /opt/conda/bin/pip install trl
 RUN /opt/conda/bin/pip install tensorboard
 RUN /opt/conda/bin/pip install -U jupyter
+
+RUN apt-get update && apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
+
+RUN echo 'root:admin_tk_2024' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN apt install nano
+
+# SSH login fix. Otherwise, the user is kicked off after login.
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
+
+FROM pytorch/pytorch
+
+
 # CMD [ "jupyter", "notebook", "--allow-root", "--ip=\"0.0.0.0\"" ]
