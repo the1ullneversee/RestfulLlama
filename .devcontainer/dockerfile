@@ -6,9 +6,13 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib/libcudart.so' >
 RUN /opt/conda/bin/pip install bitsandbytes 
 RUN /opt/conda/bin/pip install jupyter
 RUN /opt/conda/bin/pip install transformers
+RUN /opt/conda/bin/pip install datasets
 RUN /opt/conda/bin/pip install --upgrade accelerate
 RUN /opt/conda/bin/pip install peft
 RUN /opt/conda/bin/pip install safetensors
 RUN /opt/conda/bin/pip install -U ipywidgets
 RUN /opt/conda/bin/pip install -U jupyterlab
+RUN /opt/conda/bin/pip install trl
+RUN /opt/conda/bin/pip install tensorboard
+RUN /opt/conda/bin/pip install -U jupyter
 # CMD [ "jupyter", "notebook", "--allow-root", "--ip=\"0.0.0.0\"" ]
