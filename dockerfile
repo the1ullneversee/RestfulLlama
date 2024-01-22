@@ -1,5 +1,9 @@
-FROM nvidia/cuda:12.3.1-base-ubuntu22.04
+ARG PYTHON_VERSION="3.10"
+ARG BUILD_VARIANT="bullseye"
+ARG RUNTIME_VARIANT="slim-bullseye"
 
+FROM nvidia/cuda:11.0.3-base-ubuntu20.04
+FROM python:${PYTHON_VERSION}-${BUILD_VARIANT}
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,18 +18,11 @@ RUN apt-get update && \
 # Install any python packages you need
 
 WORKDIR /code
-
 RUN pip install poetry
 
 COPY ./pyproject.toml ./poetry.lock* /code/
 COPY . /code
 
-# RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-#   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-#     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-#     tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-# RUN apt-get update
-# RUN apt-get install -y nvidia-container-toolkit
 RUN poetry config virtualenvs.in-project true
 
 WORKDIR /code
@@ -33,6 +30,8 @@ WORKDIR /code
 RUN poetry source add -p explicit pytorch https://download.pytorch.org/whl/cu111/torch_stable.html
 RUN poetry add torch torchvision torchaudio
 RUN poetry install
+RUN poetry run pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2
+
 
 
 RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib/libcudart.so' >> ~/.bashrc 
