@@ -6,7 +6,7 @@ from transformers import (
 )
 from peft import PeftModel, LoraConfig, prepare_model_for_kbit_training, get_peft_model
 
-model_id='NousResearch/Llama-2-13b-hf'
+model_id='NousResearch/Llama-2-7b-hf'
 max_length = 512
 device_map = "auto"
 batch_size = 128
