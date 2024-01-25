@@ -5,6 +5,29 @@ from transformers import (
     TrainingArguments,
 )
 from peft import PeftModel, LoraConfig, prepare_model_for_kbit_training, get_peft_model
+from transformers import AutoModelForCausalLM
+import os 
+import wandb
+from trl import SFTTrainer
+import json
+
+os.environ["WANDB_PROJECT"] = "alpaca_ft"
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
+os.environ["WANDB_API_KEY"] = "a89022a323f21514f65b632439d68dc16451d2d2"
+# start a new wandb run to track this script
+
+wandb.init(
+    # set the wandb project where this run will be logged
+    project="my-awesome-project",
+    
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": 0.02,
+    "architecture": "LLM",
+    "dataset": "Custom",
+    "epochs": 3,
+    }
+)
 
 model_id='NousResearch/Llama-2-7b-hf'
 max_length = 512
@@ -13,7 +36,6 @@ batch_size = 128
 micro_batch_size = 32
 gradient_accumulation_steps = batch_size // micro_batch_size
 
-from transformers import AutoModelForCausalLM
 compute_dtype = getattr(torch, "float16")
 
 quant_config = BitsAndBytesConfig(
@@ -35,12 +57,12 @@ model.config.pretraining_tp = 1
 
 
 from datasets import load_dataset
-data_files = {"train": "../train_dataset.jsonl", "test": "../test_dataset.jsonl"}
+data_files = {"train": "train_dataset.jsonl", "test": "test_dataset.jsonl"}
 
 main_dataset = load_dataset('json', data_files=data_files)
 test, train = main_dataset['test'], main_dataset['train']
 # load tokenizer from huggingface
-tokenizer = AutoTokenizer.from_pretrained("TheBloke/Llama-2-13B-chat-GPTQ", token="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")
+tokenizer = AutoTokenizer.from_pretrained(model_id, token="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")
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
@@ -79,8 +101,7 @@ def build_llama2_prompt(instructions):
 
     return startPrompt + "".join(conversation) + endPrompt
 
-from trl import SFTTrainer
-import json
+
 
 def generate_prompt(dataset: list[dict]):
     processed = []
@@ -145,7 +166,7 @@ training_params = TrainingArguments(
     warmup_ratio=0.03,
     group_by_length=False,
     lr_scheduler_type="constant",
-    report_to="tensorboard"
+    report_to="wandb"
 )
 
 trainer = SFTTrainer(
@@ -160,3 +181,5 @@ trainer = SFTTrainer(
 )
 
 trainer.train()
+trainer.model.save_pretrained('./saved_model/')
+trainer.tokenizer.save_pretrained('./saved_model/')
