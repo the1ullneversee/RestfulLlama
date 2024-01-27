@@ -12,11 +12,18 @@ RUN apt-get update && \
     apt-get update && \
     apt install -y python3.10
 
+RUN apt-get install -y p7zip-full
+
 
 WORKDIR /code
 RUN pip install poetry
 COPY ./pyproject.toml ./poetry.lock* /code/
 COPY . /code
+# unpack the files
+RUN 7z x input_1.7z
+RUN 7z x input_2.7z
+RUN 7z x input_3.7z
+
 RUN poetry config virtualenvs.in-project false
 RUN poetry env use /usr/bin/python3.10
 RUN poetry install
