@@ -1,25 +1,22 @@
 import os
-import json
-
+import shutil
 train_data_set = {}
-with open('rest_fine_tune_cleaned.jsonl', mode='r') as cleaned:
-    for line in cleaned.readlines():
-        question_answer = json.loads(line)
-        train_data_set[question_answer['question']] = question_answer['answer']
+files = os.listdir('./input')
+file_count = len(files)
+split = file_count//3
 
-test_data_set = {}
-with open('rest_fine_tune (1).jsonl', mode='r') as raw:
-    for line in raw.readlines():
-        question_answer = json.loads(line)
-        if question_answer['question'] in train_data_set:
-            print("Duplicate found " + question_answer['question'])
-            del train_data_set[question_answer['question']]
-        test_data_set[question_answer['question']] = question_answer['answer']
+os.mkdir('input_1')
+os.mkdir('input_2')
+os.mkdir('input_3')
 
-print(f"train {len(train_data_set)} test {len(test_data_set)}")
-print(f"whole = {len(train_data_set) + len(test_data_set)}")
+folders = ['input_1', 'input_2', 'input_3']
+folder_count = 0
 
-
-with open('test_dataset.jsonl', 'w', newline='\n') as f:
-    for question, answer in test_data_set.items():
-        f.write(json.dumps({"question": question, "answer": answer})+"\n")
+file_counter = 0
+for file in files:
+    if file_counter >= split:
+        folder_count += 1
+        file_counter = 0
+    
+    shutil.move(f'./input/{file}', folders[folder_count]+f"/{file}")
+    file_counter+=1
