@@ -1,7 +1,11 @@
-FROM nvidia/cuda:11.0.3-base-ubuntu20.04
+FROM nvidia/cuda:11.0.3-devel-ubuntu20.04
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 # Install system dependencies
+RUN apt-get update && \
+    apt-get install -y \
+        git
+
 RUN apt-get update && \
     apt-get install -y \
         python3-pip
@@ -12,22 +16,17 @@ RUN apt-get update && \
     apt-get update && \
     apt install -y python3.10
 
-RUN apt-get install -y p7zip-full
-
-
 WORKDIR /code
 RUN pip install poetry
 COPY ./pyproject.toml ./poetry.lock* /code/
 COPY . /code
-# unpack the files
-RUN 7z x input_1.7z
-RUN 7z x input_2.7z
-RUN 7z x input_3.7z
 
 RUN poetry config virtualenvs.in-project false
 RUN poetry env use /usr/bin/python3.10
 RUN poetry install
 RUN poetry run pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2
+RUN apt-get install build-essential
+RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
 ENV PATH=/code/.venv/bin:$PATH
 
 RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib/libcudart.so' >> ~/.bashrc 
