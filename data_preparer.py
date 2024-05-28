@@ -4,7 +4,7 @@ import os
 import shutil
 import requests
 
-# LLM = Llama(model_path="./models/llama-2-7b-chat.Q6_K.gguf", n_gpu_layers=31, n_ctx=4096, n_batch=521, verbose=True, n_threads=16,)
+#LLM = Llama(model_path="./models/llama-2-7b-chat.Q6_K.gguf", n_gpu_layers=31, n_ctx=4096, n_batch=521, verbose=True, n_threads=16,)
 
 
 
