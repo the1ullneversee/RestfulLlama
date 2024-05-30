@@ -1,0 +1,52 @@
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y \
+        git
+
+RUN apt-get update && \
+    apt-get install -y \
+        python3-pip
+
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt install -y python3.10
+
+WORKDIR /code
+RUN pip install poetry
+COPY ./pyproject.toml ./poetry.lock* /code/
+COPY . /code
+
+RUN poetry config virtualenvs.in-project false
+RUN poetry env use /usr/bin/python3.10
+RUN poetry install
+RUN poetry run pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2
+RUN apt-get install build-essential g++ clang -y
+RUN poetry run pip install --upgrade pip setuptools wheel
+RUN CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama-cpp-python \
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/12.4.1
+
+RUN echo 'export LLAMA_CPP_LIB=~/.cache/pypoetry/virtualenvs/fine-tune-MATOk_fk-py3.10/lib/python3.10/site-packages/llama_cpp/libllama.so' >> ~/.bashrc 
+ENV PATH=/code/.venv/bin:$PATH
+
+RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib/libcudart.so' >> ~/.bashrc 
+
+
+RUN apt-get update && apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
+
+RUN echo 'root:admin_tk_2024' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN apt install nano
+
+# SSH login fix. Otherwise, the user is kicked off after login.
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
