@@ -59,7 +59,7 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
-ENTRYPOINT ["poetry", "run", "python", "local_dp.py"]
+# ENTRYPOINT ["poetry", "run", "python", "local_dp.py"]
 
 # # Setup environment
 # ENV TZ="UTC" \
