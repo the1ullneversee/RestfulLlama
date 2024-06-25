@@ -1,32 +1,20 @@
+from collections import defaultdict
 import json
-import os
-import shutil
-import sys
+from transformers import AutoTokenizer
+import json
+import hashlib
 
-import torch
-from llama_cpp.llama_cpp import _load_shared_library
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+tokenizer = AutoTokenizer.from_pretrained('NousResearch/Hermes-2-Theta-Llama-3-70B', trust_remote_code=True)
 
-# model_url = "microsoft/Phi-3-medium-128k-instruct"
-model_url = "models/Llama-3-8B-Instruct-Gradient-1048k-Q8_0.gguf"
 import llama_cpp
-
-llm = None
 llm = llama_cpp.Llama(
-    model_path=model_url,
-    # n_threads=12,  # CPU cores
-    # n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-    # n_gpu_layers=24,  # Change this value based on your model and your GPU VRAM pool.
-    # n_ctx=2048,  # Context window
-    # verbose=True,
+    model_path="Meta-Llama-3-70B-Instruct.Q4_K_M.gguf",
+    n_threads=32,  # CPU cores
+    n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
+    n_gpu_layers=79,  # Change this value based on your model and your GPU VRAM pool.
+    n_ctx=8000,  # Context window
+    verbose=True,
 )
-
-# llm = AutoModelForCausalLM.from_pretrained(
-#     model_url,
-#     model_kwargs={"torch_dtype": torch.bfloat16},
-#     device_map="auto",
-#     attn_implementation="flash_attention_2",
-# )
 
 inference_params = {
     "do_sample": True,
@@ -39,202 +27,154 @@ inference_params = {
     "return_full_text": False,
 }
 
+import json
 
-def get_instructions(user_content, system_content):
-    """
-    Note: We are creating a fresh user content everytime by initializing instructions for every user_content.
-    This is to avoid past user_content when you are inferencing multiple times with new ask everytime.
-    """
+def dump_empty(output_file, paths_hash):
+    with open(output_file, 'a') as file:
+        file.write(json.dumps({"hash": paths_hash, "questions": []}) + '\n')
 
-    instructions = [
-        {"role": "system", "content": f"{system_content} "},
-    ]
-
-    instructions.append({"role": "user", "content": f"{user_content}"})
-
-    return instructions
-
-
-def build_llama2_prompt(instructions):
-    stop_token = "</s>"
-    start_token = "<s>"
-    startPrompt = f"{start_token}[INST] "
-    endPrompt = " [/INST]"
-    conversation = []
-    for index, instruction in enumerate(instructions):
-        if instruction["role"] == "system" and index == 0:
-            conversation.append(f"<<SYS>>\n{instruction['content']}\n<</SYS>>\n\n")
-        elif instruction["role"] == "user":
-            conversation.append(instruction["content"].strip())
-        else:
-            conversation.append(
-                f"{endPrompt} {instruction['content'].strip()} {stop_token}{startPrompt}"
-            )
-
-    return startPrompt + "".join(conversation) + endPrompt
+def format_and_dump_to_jsonl(input_str, output_file, paths_hash):
+    # Split the input string into lines
+    lines = input_str.split('\n')
+    
+    # Open the output file in write mode
+    with open(output_file, 'a') as file:
+        questions = []
+        for line in lines:
+            # Check if the line is a question (does not contain "No match")
+            if not line:
+                continue 
+            if 'Question' not in line:
+                continue
+            questions.append(line)
+        file.write(json.dumps({"hash": paths_hash, "questions": questions}) + '\n')
 
 
-def chat_completion(prompt, system_content):
-    instructions = get_instructions(prompt, system_content)
-    prompt = build_llama2_prompt(instructions)
-    payload = {
-        "inputs": prompt,
-        "parameters": inference_params,
-        "stream": False,  ## <-- to have response stream.
-    }
-    response = llm(
-        prompt=prompt,
-        temperature=0.5,
-        top_p=0.95,
-        repeat_penalty=1.2,
-        top_k=50,
-        stop=["USER:"],  # Dynamic stopping when such token is detected.
-        echo=True,  # return the prompt
-    )
+def extract_resource_name(path):
+    components = path.split("/")
+    # Iterate in reverse to find the first non-parameter component
+    for component in reversed(components):
+        if not (component.startswith("{") and component.endswith("}")):
+            return component  # This is the resource name
+    return None  # In case no non-parameter component is found
 
-    return response["choices"][0]["text"]
-
-
-# generate me multiple prompts based on the prompt above:
-def get_answer(path, response):
-    # create a text prompt
-    question = f"Given the following endpoint {path}, write me the HTTP request to get the success response"
-    # sub_prompt = f"""[INST] <<SYS>>
-    # You are to be given questions about REST API Endpoints. Your answers are to be given in code or text.
-    # Give no explanation and provide no Note or opening Sure, and only give the answer in the following format, no fluff text:
-    # url: <url> headers: <headers> params: <params> body: <body> python code: <code> code needs to be in Python code using the requests library. Do not include imports, just code.
-    # <</SYS>>
-    # {question}[/INST]"""
-    system_content = """
-    You are a to be given questions about REST API Endpoints. Your answers are to be given in code or text.
-    Give no explanation, and only give the answer in the following format, no fluff text:
-    url: <url> headers: <headers> params: <params> body: <body> python code: <code> code needs to be in Python code using the requests library. Do not include imports, just code.
-    """
-    answer = chat_completion(prompt=question, system_content=system_content)
-    return answer, question
-
-
-def clean_answer(answer):
+def prompt_llama(messages):
+    #chat_template = build_llama3_prompt(prompt, system_content)
+    
+    # Generate a response from the model
+    answer = ""
     try:
-        # strip out newlines
-        answer = answer.replace("\n", " ")
-        # the answer always contains some explanation before the url: tag, so we remove it
+        answer = llm.create_chat_completion(
+            messages=messages
+        )
     except Exception as exc:
         print(exc)
-    return answer
+        return answer
+    return answer["choices"][0]["message"]
+
+def get_index_to_start(output_file):
+    index = 0
+    with open(output_file, 'r') as file:
+        lines = file.readlines()
+        index = len(lines)
+    return index
 
 
-# def question_answer_generator_from_parsed_api(api: ParsedApi, main_path):
-#     questions, answers = [], []
-#     for path_response in api.paths_with_response():
-#         path, response = path_response[0], path_response[1]
-#         answer, question = get_answer(path, response)
-#         answer = clean_answer(answer)
-#         questions.append(question)
-#         answers.append(answer)
+def create_path_hash(paths: list):
+    concat = ''.join(paths)
 
-#     paths = [p_r[0] for p_r in api.paths_with_response()]
-#     question = (
-#         "Give the following RESTful Endpoint paths. What operations could I perform on them? \n"
-#         + json.dumps(paths)
-#         + "\n"
-#     )
-#     system_content = f"""
-#         The input will be a list of strings representing resource paths for a RESTFul API. Give you answers as operations a consumer of the API could perform.
-#         Write the operations in natural language, and separate them with a comma, no fluff text.
-#     """
-#     answer = chat_completion(prompt=question, system_content=system_content)
-#     answer = clean_answer(answer)
-
-#     question = (
-#         "Give the following RESTful Endpoint paths. What Paths require an entity_id to access and can you get that entity from a different path? If you can which path do you need to call? \n"
-#         + json.dumps(paths)
-#         + "\n"
-#     )
-#     system_content = f"""
-#         The input will be a list of strings representing resource paths for a RESTFul API.
-#         Give your response based on which paths require an entity id, and if you can get that entity elsewhere, tell the user how.
-#         Write the operations in natural language, and separate them with a comma, no fluff text.
-#     """
-#     answer = chat_completion(prompt=question, system_content=system_content)
-#     answer = clean_answer(answer)
-#     questions.append(question)
-#     answers.append(answer)
-
-#     dump_to_file(questions, answers, main_path)
+    hash_object = hashlib.sha256(concat.encode())
+    hash_hex = hash_object.hexdigest()
+    return hash_hex
 
 
-readable = 0
-broken_files = []
-read = False
-definitions = {}
-parsed_apis = []
+system_content = """You will be presented lists of a JSON representation of a RESTFul API Path including the method.
+                    You should tell me if to call this API path I need to provide any information specified by the JSON schema parameters or request body. Your response should be in JSON {"param": value, "type": value}
+                    If nothing is required just put an empty JSON
+                """
+question_placeholder = """<CONTEXT>{context}</CONTEXT>"""
 
-system_content = """You are a helpful, smart, kind, and efficient AI assistant. 
-                    You always fulfill the user's requests to the best of your ability.
-                    You are to be given questions about REST API Endpoints.
-                    Where synthetic data is required, you are to generate it to best fit the parameter type.
-                    """
-question = """For each endpoint path in the following context, write a question that a user might ask that could be answered by that endpoint.
-              If the request needs parameters, include data that would be required to make the request.
-              <CONTEXT>{context}</CONTEXT>"""
+input_file = "./data/0_output.json"
+f = open(input_file, "r")
+lines = f.readlines()
+f.close()
 
-hf_tokenizer = AutoTokenizer.from_pretrained(
-    "meta-llama/Meta-Llama-3-8B",
-    revision="refs/pr/6",
-    token="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",
-)
-# pipe = pipeline(
-#     "text2text-generation",
-#     model=llm,
-#     tokenizer=hf_tokenizer,
-#     max_length=1000,
-#     token="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",
-# )
-with open("output.json", "r") as f:
-    line = f.readline()
-    while line != "":
-        json_dict = json.loads(line)
-        contexts = list(json_dict.values()).pop()
-        path_context = contexts["path_context"]
-        full_context = contexts["full_schema_context"]
-        chat_messages = [
+output_file = '0_questions.jsonl'
+index = get_index_to_start(output_file=output_file)
+print(f"Starting from {index}")   
+
+try:
+    paths = []
+    for line in lines[index:]:
+        data = json.loads(line)
+        full_schema_context = json.loads(data["full_schema_context"])
+        path_context = json.loads(data["path_context"])
+        path_parameters = {}
+        response_parameters = defaultdict(list)
+        request_params = defaultdict(list)
+        index = 0
+        question = ""
+        second_question = ""
+        for path, values in full_schema_context.items():
+            method = values.get("method")
+
+            resource = extract_resource_name(path)
+            if not values.get("parameters") and not values.get("request_body"):
+                continue
+            full_line_item = f"{index}. [{{method: {values.get('method')}], path: {path}, summary: {values.get('summary')}, parameters: {values.get('parameters')}, request_body: {values.get('request_body') or []}, response_body: {values.get('response_body') or []}}}"
+            short_line_item = f"{index}. | {{\method\": \"{values.get('method')}\", \"path\": \"{path}\", \"response_body\": {values.get('response_body') or []}}}\n"
+            second_question += short_line_item
+            question += full_line_item
+            # print(
+            #     f"[{values.get('method')}] {path} Summary: {values.get('summary')} Parameters: {values.get('parameters')}, Request Body: {values.get('request_body') or []}, Response Body: {values.get('response_body') or []}"
+            # )
+            index += 1
+            paths.append(path)
+        
+        paths_hash = create_path_hash(paths=paths)
+        messages = [
             {"role": "system", "content": system_content},
-            {"role": "user", "content": question.format(context=full_context)},
+            {
+                "role": "user",
+                "content": question_placeholder.format(context=question)
+            }
         ]
-        # Generate completions
-        completion = llm.create_chat_completion(messages=chat_messages)
-        print(completion)
-        line = f.readline()
+        answer = prompt_llama(messages=messages)
+        if answer == "" or answer == "":
+            dump_empty(output_file, paths_hash)
+            continue
+        print(answer['content'])
+        messages.append({"role": "assistant", "content": answer['content']})
+        print("=== END ===")
+        # clear the terminal
+        new_question =f"""Now by looking at the same list of endpoint paths but just their response bodies,
+        pay attention to the response body of each path, and try and see if you can match any of the information given in the response body to a required parameter in the previous lists.
+        Your response should be in the format
+        {second_question}
+        """
+        
+        messages.append({"role": "user", "content": new_question})
+        answer = prompt_llama(messages=messages)
+        if not answer or answer == "":
+            dump_empty(output_file, paths_hash)
+            continue
+        llm_response = answer["content"]
+        messages.append({"role": "assistant", "content": llm_response})
 
+        question = f""""For each of the endpoints that have a match, write a synthetic question that a user might ask a chatbot that could be answered by that endpoint, and the question requires data that is retrieved from the matching endpoint. Please respond in the following format:
+            INDEX: [line index] Question: [insert synthetic question]
 
-# main_path = './swagger-files/'
-
-
-# for file_name in files:
-#     try:
-#         file = file_name
-#         if file in processed_files or file in broken_path:
-#           print("processed file or its broken " + file)
-#           continue
-#         shutil.move(main_path+"output/"+file, processing_path+file)
-#         parser = SwaggerParser(swagger_path=processing_path+file)
-#         print(f"{parser.specification['info']['description']} has {len(parser.paths)} paths")
-#         paths = list(parser.paths.keys())
-#         for key, value in parser.specification['definitions'].items():
-#             definitions[key] = value
-#         parsed_api = parse_api_resources(paths)
-#         parsed_apis.append(parsed_api)
-#         question_answer_generator_from_parsed_api(parsed_api, main_path)
-#         # move file to processed folder.
-#         shutil.move(processing_path+file, processed_path+file)
-#         readable += 1
-#         read = True
-#         print(f"--- processed {readable} out of {file_count} ---")
-
-#     except Exception as exc:
-#         print(exc)
-#         broken_files.append(file)
-#         shutil.move(processing_path+file, broken_path+file)
-# print(readable)
-# print(len(broken_files))
+            For example:
+            INDEX: 0 Question: What is my user ID?
+            Please provide one response per endpoint, following this format."
+                    """
+        messages.append({"role": "user", "content": question})
+        answer = prompt_llama(messages=messages)
+        if not answer or answer == "":
+            dump_empty(output_file, paths_hash)
+            continue
+        llm_response = answer["content"]
+        print(llm_response)
+        format_and_dump_to_jsonl(llm_response, output_file, paths_hash)
+except Exception:
+    dump_empty(output_file=output_file, paths_hash=paths_hash)

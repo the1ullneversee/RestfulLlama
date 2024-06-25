@@ -1,0 +1,396 @@
+{"questions": ["INDEX: 4 Question: What is the status of my provisioning job with ID {jobid}?", "INDEX: 5 Question: Can I simulate provisioning for brand {brandCode} in region {region}?", "INDEX: 6 Question: What is the result of triggering provisioning for vehicle with VIN {vin}?"]}
+{"questions": ["INDEX: 0 Question: Can you tell me which shipping speeds are available for my order with SKUs X, Y, and Z to be delivered to country code AA and postal code BBBB?", "INDEX: 1 Question: What is the earliest arrival date for my order with SKUs X, Y, and Z if I choose shipping speed A and want it delivered to country code AA and postal code BBBB?"]}
+{"questions": ["INDEX: 1 Question: How many unread notifications do I have?"]}
+{"questions": ["INDEX: 14 Question: Can you show me the list of invoices associated with ID {id}?", "INDEX: 15 Question: What are the line items for the invoice with ID {id}?", "INDEX: 16 Question: Can you provide detailed information about the invoice with ID {id}?", "INDEX: 18 Question: What is the content of the attachment with ID {id} in the albo?"]}
+{"questions": ["INDEX: 5 Question: What are the shop reports for my username?", "INDEX: 6 Question: Can I see all casheer sessions for a specific username?", "INDEX: 7 Question: What is the ticket information for ID 1234?", "INDEX: 8 Question: How do I cancel a ticket with ID 5678?", "INDEX: 9 Question: What are the race details for ticket ID 9012?", "INDEX: 10 Question: Can I view all tickets associated with my username?", "INDEX: 11 Question: Which of my tickets have won but not been paid out yet?", "INDEX: 12 Question: What is the casheer session information for ticket ID 3456?", "INDEX: 13 Question: Can I see the shop report for ticket ID 7890?"]}
+{"questions": ["INDEX: 1 Question: What rooms does a specific user participate in?", "INDEX: 3 Question: Who are the participants in a specific room?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the score data I just submitted?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the total value for the metric I'm tracking in my company's installation?", "INDEX: 2 Question: What was the consolidated metric value for my company's installation last week?"]}
+{"questions": ["INDEX: 0 Question: What is the score I just submitted?"]}
+{"questions": ["INDEX: 1 Question: What is my customer profile information?", "INDEX: 2 Question: What is the transaction ID for my recent payment?", "INDEX: 4 Question: Can you show me my customer payment profiles?", "INDEX: 5 Question: What is the status of my payment with customer payment profile ID XYZ?", "INDEX: 6 Question: What is the transaction ID for my recent payment with customer payment profile ID ABC?", "INDEX: 7 Question: Is my payment method valid, and what is the transaction ID?"]}
+{"questions": ["INDEX: 0 Question: What are my recent scores?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Is my application healthy?", "INDEX: 1 Question: What's the detailed health status of my application?", "INDEX: 2 Question: What information does my application provide about itself?"]}
+{"questions": ["INDEX: 0 Question: Can you generate a fingerprint file from the audio of my campaign with ID {campaignId} and file {file}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 5 Question: What is the status code of my stream configuration?", "INDEX: 6 Question: Can you show me the body of my stream configuration?", "INDEX: 7 Question: Is my application in read-only mode?", "INDEX: 9 Question: How many messages are currently in my queue?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What is the status of my payment authorization for order {orderId}?", "INDEX: 4 Question: What is the ORDERID associated with my payment initialization?", "INDEX: 6 Question: What is the status of my payment verification for order {orderId} and alias {alias}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What is the creation time and name of my newly created namespace?", "INDEX: 3 Question: Can you tell me the creation time and name of the namespace I'm about to delete?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the ID of my email request?", "INDEX: 1 Question: Can you give me the ID of my push notification request?", "INDEX: 2 Question: What is the ID of my SMS request?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the status of my DCA campaign request with campaign ID {campaignId} and target registrar {targetRegistrar}?", "INDEX: 1 Question: Can you check the status of my DCA campaign request with ID {id}?", "INDEX: 3 Question: What are the details of the number {number} that I imported?"]}
+{"questions": ["INDEX: 3 Question: What authorities does a user have?"]}
+{"questions": ["INDEX: 4 Question: What is the updated distribution status for distribution ID {distributionId}?", "INDEX: 8 Question: Can you confirm that the status of distribution {distributionId} has been successfully updated to {status}?", "INDEX: 9 Question: What are the organization details for organization ID {organizationId}, company ID {companyId}, and unique key {uniqueKey}?", "INDEX: 13 Question: Has the distribution with ID {distributionId} been cancelled successfully?", "INDEX: 14 Question: Is the organization with ID {organizationId} now active?"]}
+{"questions": ["INDEX: 0 Question: What is the URL for a given locale and ID?", "INDEX: 1 Question: Can you give me all URLs for a specific locale?", "INDEX: 2 Question: What is the URL ID for a specific URL in a given locale?", "INDEX: 3 Question: What is the URL for a given locale and ID from another source?", "INDEX: 4 Question: Can you provide all URLs for a specific locale from another source?", "INDEX: 5 Question: What are all available URLs from another source?", "INDEX: 6 Question: What is the URL ID for a specific URL in a given locale from another source?", "INDEX: 7 Question: Can you give me all URL IDs for a specific locale from another source?", "INDEX: 8 Question: What are all available URL IDs from another source?", "INDEX: 9 Question: What is the product URL for a given locale and product ID?", "INDEX: 10 Question: Can you provide all product URLs for a specific locale?", "INDEX: 11 Question: What are all available product URLs?", "INDEX: 12 Question: What is the product ID for a specific URL in a given locale?", "INDEX: 13 Question: Can you give me all product IDs for a specific locale?", "INDEX: 14 Question: What are all available product IDs?"]}
+{"questions": ["INDEX: 0 Question: What are my recent scores?"]}
+{"questions": ["INDEX: 0 Question: Can I leave feedback about my experience?", "INDEX: 1 Question: How do I update my device settings?", "INDEX: 2 Question: How do I create a new user account?", "INDEX: 3 Question: What are the daily normals for my location?", "INDEX: 4 Question: What is the current air quality in my area?", "INDEX: 5 Question: What is the weather forecast for my location?", "INDEX: 6 Question: What payments have I made with my device?", "INDEX: 7 Question: What is the position of the sun and moon today?", "INDEX: 8 Question: Are there any weather alerts in my area?", "INDEX: 9 Question: What are the monthly normals for my location?", "INDEX: 10 Question: Is there an update available for my mobile app?", "INDEX: 11 Question: How do I configure my device settings?", "INDEX: 12 Question: Can I add a new payment method to my account?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the rewritten URL for a given title?"]}
+{"questions": ["INDEX: 1 Question: What is the health status of a specific component?", "INDEX: 2 Question: Can you tell me the health details of a particular instance within a component?", "INDEX: 5 Question: What is the current hystrix configuration for a given path?"]}
+{"questions": ["INDEX: 0 Question: What are the scores I've received so far?"]}
+{"questions": ["INDEX: 3 Question: What is my user information?", "INDEX: 5 Question: What product details can I get with product ID 1234?", "INDEX: 7 Question: Can you serve me an image file named \"image1.jpg\"?", "INDEX: 8 Question: How do I create a new user token with email and password?", "INDEX: 10 Question: Is the stock of product X valid for my cart items?", "INDEX: 11 Question: What is the delivery cost for a package weighing 2kg to province Y?", "INDEX: 12 Question: Are the products in my cart still in stock?", "INDEX: 13 Question: Can you sync the product IDs in my cart with the Fitco database?", "INDEX: 14 Question: Is the product X still valid for my retail order?"]}
+{"questions": ["INDEX: 0 Question: What are the top scores in the game?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What is the template ID I just created?", "INDEX: 5 Question: Can you show me the ID of the default template I'm looking at?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is the status of my authorization request?", "INDEX: 4 Question: Is my access confirmation empty or does it have a model associated with it?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What was the status of my last email campaign?"]}
+{"questions": ["(Note: I assume I should respond with one question per endpoint, in the format `INDEX: [line index] Question: [insert synthetic question]`)"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: In which region is the structure I'm interested in located?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the readings for a shipment with box ID 'some_id' and site ID 'some_site'?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the recent scores I've achieved in the game?"]}
+{"questions": ["INDEX: 1 Question: What is the status of the found animal case I just created?", "INDEX: 5 Question: Can you show me the organization details for a given human-readable ID?", "INDEX: 7 Question: What is the updated organization information after approval?", "INDEX: 8 Question: What is the registration file associated with my organization?", "INDEX: 14 Question: What are the details of the register I just created?", "INDEX: 17 Question: What permissions does a user have in a specific domain?", "INDEX: 19 Question: What are all the permissions for a given user?", "INDEX: 20 Question: What is the display name of the user I just created?"]}
+{"questions": ["INDEX: 3 Question: What caches do I have available?", "INDEX: 7 Question: What environment variables match my search term?", "INDEX: 15 Question: How do I configure logging for a specific logger named \"myLogger\"?", "INDEX: 18 Question: What is the current value of the metric \"myMetric\"?", "INDEX: 24 Question: Can you show me the routes in JSON format?"]}
+{"questions": ["INDEX: 0 Question: What is the current health status of my application?", "INDEX: 1 Question: Can you provide more detailed information about the health of my application?", "INDEX: 2 Question: What information does my application provide about itself?"]}
+{"questions": ["INDEX: 3 Question: What is the status of my load acceptance with external ID XYZ?", "INDEX: 5 Question: Can I retrieve a document for load ID 1234?"]}
+{"questions": ["INDEX: 3 Question: What are the contact preferences for a specific INSZ and product?", "INDEX: 4 Question: How many contacts have been checked against the UseBouncer service for a particular product?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What course ID is associated with my assignment?", "INDEX: 2 Question: Can you show me the activities and metadata for a specific assignment?", "INDEX: 3 Question: What is the description and due time for an assignment created by template?", "INDEX: 4 Question: Which section ID is linked to this copied assignment?", "INDEX: 5 Question: What is the assignment type and title for a newly created assignment in a specific section?", "INDEX: 7 Question: Can you update the metadata and activities for an existing assignment in a section?", "INDEX: 8 Question: Is there a template with a specific description or title that I can use to create an assignment?"]}
+{"questions": ["INDEX: 3 Question: What is the status of task with ID {id} after deletion?", "INDEX: 6 Question: What tasks do I have scheduled for horse {horseId} on day {day}?", "INDEX: 7 Question: What tasks do I have scheduled for horse {horseId} today?", "INDEX: 8 Question: What upcoming tasks do I have scheduled for horse {horseId}?", "INDEX: 9 Question: What tasks do I have scheduled for horse {horseId} in the next 6 months?", "INDEX: 10 Question: Was task with ID {id} successfully deleted?"]}
+{"questions": ["INDEX: 3 Question: Was my essay support request successful?"]}
+{"questions": ["INDEX: 5 Question: What licenses do I have?", "INDEX: 6 Question: Do I have a Salesforce account?", "INDEX: 7 Question: What licenses does my account have?", "INDEX: 8 Question: What is my account information?", "INDEX: 9 Question: What license details do I have for this ID?", "INDEX: 12 Question: What is my user information in Salesforce?", "INDEX: 13 Question: Which tenants have a specific product license?", "INDEX: 14 Question: Can I switch to tenant with ID {id}?", "INDEX: 15 Question: What is my account information in Salesforce?", "INDEX: 16 Question: What changes have been made to my internal user account?", "INDEX: 17 Question: What changes have been made to tenants in the last {timeInterval} seconds?", "INDEX: 18 Question: What is the history of tenant with ID {id}?", "INDEX: 19 Question: Who are the users for tenant with ID {id}?", "INDEX: 20 Question: Do I still have access to tenant {tenant}?", "INDEX: 21 Question: Which tenants do I have access to?", "INDEX: 22 Question: Can I switch to tenant with ID {tenantId}?", "INDEX: 25 Question: How do I add a new superuser?", "INDEX: 27 Question: How do I create test and production tenants for my account?", "INDEX: 29 Question: How do I grant temporary access to a tenant as a superuser?", "INDEX: 30 Question: How do I extend my access to a tenant as a superuser?", "INDEX: 34 Question: How do I revoke permissions on a tenant from a superuser?"]}
+{"questions": ["INDEX: 0 Question: What is the token I received after registration?"]}
+{"questions": ["INDEX: 1 Question: Can you give me details about the institution with ID {uniqueId}?"]}
+{"questions": ["INDEX: 0 Question: What events occurred between yesterday and today in the cloud service I'm using?"]}
+{"questions": ["INDEX: 5 Question: What is the value of the environment variable named {name}?", "INDEX: 8 Question: How do I configure the logger with name {name}?", "INDEX: 9 Question: What is the current value of the metric named {name}?"]}
+{"questions": ["INDEX: 3 Question: What is the status of my delete request?", "INDEX: 4 Question: Is this person on the no-fly list?", "INDEX: 5 Question: Does this person match anyone on the TSA watchlist?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Is the application healthy?", "INDEX: 1 Question: What information does the application provide about itself?"]}
+{"questions": ["INDEX: 4 Question: What instructions are available for reference ID {ref}?", "INDEX: 6 Question: What is the status of the user agent with X-User-Agent header {X-User-Agent}?", "INDEX: 7 Question: What videos are in playlist {playlistId}?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the results of executing a program job with data \"some_string\"?"]}
+{"questions": ["INDEX: 2 Question: What is the organisation ID after creation?", "INDEX: 4 Question: Can you show me the details of an organisation with a specific ID or slug?", "INDEX: 9 Question: What is my organisation's updated information after making changes?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is the proposal ID for the submission I just made?"]}
+{"questions": ["INDEX: 0 Question: Was my recaptcha verification successful?", "INDEX: 1 Question: What is the email address of my partner company?", "INDEX: 2 Question: What is the grade level of my teacher?"]}
+{"questions": ["INDEX: 2 Question: What is the estimated theta value for the current session items in my adaptive activity?"]}
+{"questions": ["INDEX: 9 Question: Can I delete a delivery with the given request map?", "INDEX: 10 Question: How do I confirm payment for a delivery using the provided request map?", "INDEX: 13 Question: Can I update the YJ code for a delivery using this request map?", "INDEX: 14 Question: How do I delete a delivery v2 using the given request map?", "INDEX: 19 Question: What happens when I add a new good with the provided request map?", "INDEX: 20 Question: How do I place an order for goods using the given request map?", "INDEX: 21 Question: Can I mark a good as sold out using this request map?", "INDEX: 22 Question: How do I update a good's information using the provided request map?"]}
+{"questions": ["INDEX: 0 Question: What are my recent scores?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What farms and fields do I have associated with my organization and partner?", "INDEX: 3 Question: What files do I have stored for my organization and partner?", "INDEX: 5 Question: What field operations are available for my organization, field, and partner?", "INDEX: 6 Question: Where is the file I uploaded to my AP-N2N shape located?", "INDEX: 7 Question: Where is the file I uploaded to my Ap Shape located?"]}
+{"questions": ["INDEX: 3 Question: What is the language code and name of the follow-up event input in my current session?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Have I started watching a live stream?", "INDEX: 1 Question: Have I stopped watching a live stream?"]}
+{"questions": ["INDEX: 0 Question: What is the score data I just submitted?"]}
+{"questions": ["INDEX: 3 Question: What messages did a specific at-risk user receive between certain dates?", "INDEX: 5 Question: What statistics do I have for at-risk users between certain dates and in a specific time zone?", "INDEX: 6 Question: Can you provide a CSV report of at-risk user statistics between certain dates and in a specific time zone?", "INDEX: 7 Question: Can you provide a PDF report of at-risk user statistics between certain dates and in a specific time zone?"]}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: Suggest a unique username based on my first name, last name, and email address.", "INDEX: 5 Question: What are the latest log entries for today?"]}
+{"questions": ["INDEX: 28 Question: What is the Firebase user information for user with ID {id}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: Can you update my profile with my new country, first name, last name, post code, and username?", "INDEX: 4 Question: What is my current subscription status and username?"]}
+{"questions": ["INDEX: 0 Question: How many display ads are available for my user ID?", "INDEX: 1 Question: What search ads are relevant to my product query?"]}
+{"questions": ["INDEX: 1 Question: What is the description of the Life Cycle Action named {name} in tenant {tenantId}?"]}
+{"questions": ["INDEX: 2 Question: Are there any restrictions for a person with birth date [birth_date], name [name], personal code [personal_code], and surname [surname]?"]}
+{"questions": ["INDEX: 4 Question: What is the status of my resource messages request with limit {limit} and sorted by {field}?", "INDEX: 6 Question: Can you show me the list of resource tools available with a limit of {limit} items, sorted by {field}?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is my full name and what roles do I have in the system?"]}
+{"questions": ["INDEX: 2 Question: Can I log in with my phone number and password?", "INDEX: 4 Question: How do I change my account password if I forgot it?", "INDEX: 5 Question: Is my account currently enabled or disabled?"]}
+{"questions": ["INDEX: 0 Question: Can I retrieve the payment method used for my last order?", "INDEX: 1 Question: What is my user ID associated with my recent purchase?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: Can you show me all the equipment and their corresponding photos at a specific location?", "INDEX: 4 Question: How do I update the checklist for a particular equipment with new information?"]}
+{"questions": ["INDEX: 0 Question: What feedback did I send to Intercom?"]}
+{"questions": ["INDEX: 7 Question: What is the function of the chaincode named {chaincodeName} on channel {channelName}?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: Can I pair my device with an OF?", "INDEX: 2 Question: How do I unpair all tracers from my asset?", "INDEX: 3 Question: What is the status of my sent message?", "INDEX: 4 Question: Are there any zone constraints in place?", "INDEX: 5 Question: What messages are waiting for me in the queue?", "INDEX: 6 Question: Can I set a new command for my device?", "INDEX: 7 Question: How do I delete a specific message from the queue?", "INDEX: 8 Question: What is the result of uploading my message to the server?", "INDEX: 9 Question: What is the current timeout setting?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: How many active memberships do I have in my hub?", "INDEX: 1 Question: What is the churn rate of my teams over the past quarter?", "INDEX: 2 Question: How many deals did I convert last month?", "INDEX: 3 Question: What is the total number of deals I have in my pipeline?", "INDEX: 4 Question: What was my revenue for the past year?", "INDEX: 5 Question: How occupied is my hub currently?", "INDEX: 6 Question: Which teams are using meeting rooms the most?", "INDEX: 7 Question: How many meetings did Team X book last week?", "INDEX: 8 Question: Who booked the most meeting rooms in my hub last month?"]}
+{"questions": []}
+{"questions": ["INDEX: 6 Question: When was the schema last updated in the dev environment?", "INDEX: 7 Question: What is the name of the latest version of the schema in the staging environment?", "INDEX: 8 Question: What is the creation date of the schema with the given namespace and message type code?"]}
+{"questions": []}
+{"questions": ["INDEX: 6 Question: Can I upload a file to device {uniqueId} in company {cpId}?", "INDEX: 7 Question: What is the ingestion status for unique ID {uniqueId}?", "INDEX: 8 Question: Is type2 ingestion available for unique ID {uniqueId}?"]}
+{"questions": ["INDEX: 3 Question: What are my current preferences for a specific module?", "INDEX: 4 Question: What widgets are currently configured on my dashboard?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 9 Question: Can I reset my password using this token?", "INDEX: 10 Question: How do I add report links to fund with ID {id}?", "INDEX: 11 Question: How do I set report links for fund with ID {id}?", "INDEX: 12 Question: How do I add funds to user with ID {id}?", "INDEX: 13 Question: How do I set funds for user with ID {id}?", "INDEX: 14 Question: How do I add report links to user with ID {id}?", "INDEX: 15 Question: How do I set report links for user with ID {id}?", "INDEX: 16 Question: How do I remove report links from fund with ID {id}?", "INDEX: 17 Question: How do I remove funds from user with ID {id}?", "INDEX: 18 Question: How do I remove report links from user with ID {id}?"]}
+{"questions": ["INDEX: 1 Question: What is my email address?", "INDEX: 2 Question: Is presentation mode enabled for my profile?", "INDEX: 3 Question: Am I using two-factor authentication?", "INDEX: 4 Question: What is my user ID?", "INDEX: 7 Question: Is two-factor authentication enabled for my account?"]}
+{"questions": ["INDEX: 0 Question: What is the inventory information for my product in a specific country?", "INDEX: 1 Question: Is this document valid for fulfillment?"]}
+{"questions": ["INDEX: 1 Question: What are the collectes associated with my vehicle's immatriculation number?", "INDEX: 2 Question: What are the updated waste collection lines for a specific intervention?", "INDEX: 3 Question: What is the current condition execution status for an intervention?", "INDEX: 4 Question: How do I upload files related to an intervention?", "INDEX: 5 Question: What is the updated tournee information after modifying its tonnage?"]}
+{"questions": ["INDEX: 1 Question: What is the lookup type for a specific ID?", "INDEX: 2 Question: Can you show me all lookups by type and project type that match my current project settings?", "INDEX: 3 Question: What information do I need to delete a lookup with a specific ID?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 6 Question: Can I add a product with EPI 123 and EMPi 456 to the catalog?", "INDEX: 8 Question: How do I update the stock level of product with PID abc and EPI 789 to 100 units?", "INDEX: 9 Question: What are the active ISA subscriptions for product with PID xyz and EPI 901?", "INDEX: 10 Question: Can you provide me with the current data for product with PID def and EPI 234, including EMPi 567?", "INDEX: 11 Question: What is the current variant data for product with PID ghi and EPI 890?", "INDEX: 12 Question: How do I add a product update to the queue for product with PID jkl and EPI 345, with product meta data {pr: 10, iqty: 20}?", "INDEX: 13 Question: Is there an update available for product with PID mno and EPI 678, EMPi 901?", "INDEX: 14 Question: Can you send an alternate product for product with PID pqr and EPI 234, EMPi 567, with actual EPI 890 and actual product meta data {pr: 10, iqty: 20}?", "INDEX: 15 Question: How do I add a product with PID stu and EPI 901, EMPi 234 to the catalog?", "INDEX: 16 Question: Can you update events wishlist for product with PID vwx and EPI 345, with product meta data {pr: 10, iqty: 20}?", "INDEX: 19 Question: How do I continue crawling IDs for product with PID yz1 and page number 2?", "INDEX: 20 Question: Can you continue crawling details for product with PID 2ab and page number 3?", "INDEX: 26 Question: Is there an EMPi available for review of product with PID cde and EMPi 456?"]}
+{"questions": ["INDEX: 0 Question: What is my login token?", "INDEX: 1 Question: Did I receive an OTP for registration?", "INDEX: 2 Question: Is my verification code correct?"]}
+{"questions": ["INDEX: 1 Question: What custom attributes are defined for an asset type with ID \"asset_type_id\" and client list [\"client_list\"]?", "INDEX: 2 Question: How do I delete a view with handle \"view_handle\"?", "INDEX: 3 Question: Can you show me the last \"lines\" lines of log output from this server?", "INDEX: 4 Question: How do I update custom attributes for a view with handle \"view_handle\" and client ID \"client_id\"?", "INDEX: 5 Question: How do I set the minimum logging level to \"log_level\" for the tail logs endpoint?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 7 Question: Do I have access to ePaper?", "INDEX: 8 Question: Can I view ePaper content with my current subscription?"]}
+{"questions": ["INDEX: 3 Question: What is the instance ID of the public page with ID {pageId}?", "INDEX: 4 Question: Can you tell me the instance ID of the working page with ID {pageId}?"]}
+{"questions": ["INDEX: 3 Question: What is the current session status for exam ID {examId}?"]}
+{"questions": []}
+{"questions": ["INDEX: 5 Question: What is my bot's information?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What are the vehicle incentives for a specific UUID?"]}
+{"questions": ["INDEX: 2 Question: Can I get a signed image rendition URL for asset IDs?", "INDEX: 3 Question: How can I get a signed original URL for asset IDs?", "INDEX: 4 Question: What is the signed preview URL for asset IDs?", "INDEX: 5 Question: Where can I find the signed thumbnail URL for asset IDs?", "INDEX: 6 Question: Can you retrieve metadata for an asset with ID?", "INDEX: 7 Question: How do I update an asset with a new original file and get its metadata?"]}
+{"questions": ["INDEX: 5 Question: What was the demand value at a specific timestamp for a given descriptor and site ID?", "INDEX: 6 Question: What was the state of charge value at a specific timestamp for a given site ID?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What is the status of my upload with ID {id}?", "INDEX: 7 Question: What plan did I choose for my last payment?"]}
+{"questions": ["INDEX: 1 Question: What activities have I recently triggered in the system?", "INDEX: 2 Question: Can you show me a list of events that occurred in the last hour?", "INDEX: 3 Question: What telemetry data has been collected from my device in the past 24 hours?"]}
+{"questions": ["INDEX: 2 Question: What is the ID of the captured variable I just deleted?", "INDEX: 3 Question: What is the ID of the question I just removed?", "INDEX: 4 Question: What is the ID of the response I just deleted?", "INDEX: 11 Question: What company does this survey belong to and what is its ID?", "INDEX: 12 Question: What is the status of the survey import for platform {platformId} and company {companyId}?"]}
+{"questions": ["INDEX: 0 Question: Can I see a preview of template {templateId}?", "INDEX: 1 Question: How can I generate newsletter HTML for template {template} with XML {xml}?", "INDEX: 2 Question: Is my template {template} valid?"]}
+{"questions": ["INDEX: 0 Question: Can you reprocess the dead letter queue for a specific message ID in the user sync admin queue?"]}
+{"questions": ["INDEX: 5 Question: What is the status of my notification for owner ID ABC123?", "INDEX: 7 Question: Can you retrieve the details of my notification with ID 12345?", "INDEX: 8 Question: Who are all the users associated with my application ID XYZ789?"]}
+{"questions": ["INDEX: 2 Question: How many records did I get in the last vendor data query?", "INDEX: 4 Question: What is the total number of records in the vendor data pagination?"]}
+{"questions": ["INDEX: 4 Question: What is the CWC response data for entity XYZ with message ID ABC?", "INDEX: 5 Question: Can you retrieve the message details for message ID 12345?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the score I just submitted?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 4 Question: Can you give me the coupon code I received for my email address?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the status of my article resolution request?", "INDEX: 1 Question: Can you update the status of my article resolution task?", "INDEX: 2 Question: How do I acquire grants data for a specific source and year range?", "INDEX: 3 Question: How can I stop a job execution by its ID and type?"]}
+{"questions": ["INDEX: 0 Question: What is the name of the application with ID {id}?", "INDEX: 2 Question: Is API key {apiKey} active for application {applicationId} in stage {applicationStage}?", "INDEX: 4 Question: What is the stage of the application associated with API key {apiKey} and application ID {applicationId}?"]}
+{"questions": ["INDEX: 0 Question: Is my application healthy?", "INDEX: 1 Question: What's the detailed health status of my application?", "INDEX: 2 Question: What information does my application provide about itself?"]}
+{"questions": ["INDEX: 5 Question: What is my current status in Salamander?", "INDEX: 6 Question: Which buildings am I currently monitoring?", "INDEX: 8 Question: How do I provide feedback on the page I'm currently viewing?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What was the table row primary key ID of the audit with ID {id}?"]}
+{"questions": ["INDEX: 0 Question: What is my authorization token and user ID after registration?", "INDEX: 1 Question: Is my phone number already registered, and if so, what's my user ID?"]}
+{"questions": ["INDEX: 0 Question: Can you show me the details of a quarantined message with customer ID {customerId}, mailbox ID {mailboxId}, O365 message ID {o365MessageId}, recipient address {recipientAddress}, and Sophos email ID {xSophosEmailId}?", "INDEX: 1 Question: What is the summary of quarantined messages for my customer ID {customerId} between dates {beginDate} and {endDate}?", "INDEX: 2 Question: (No match found)", "INDEX: 3 Question: (No match found)"]}
+{"questions": ["INDEX: 0 Question: What are the fares for a specific date range and locations?", "INDEX: 1 Question: Can you show me all journeys available from origin to destination on a certain day with maximum X journeys?", "INDEX: 2 Question: What is the current version of serviced location pairs data?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: How do I clear the cache for a specific name?", "INDEX: 1 Question: Can you deactivate my CMS content for this site token?", "INDEX: 2 Question: How do I invalidate my CMS content for this site token?", "INDEX: 3 Question: What is the status of my contact request submission?", "INDEX: 4 Question: Did my eSignal contact request go through successfully?", "INDEX: 5 Question: Was my questionable price report submitted correctly?", "INDEX: 6 Question: Am I registered for the webinar with this specific date and time?", "INDEX: 7 Question: Did I successfully register for the weekly trading tips?"]}
+{"questions": ["INDEX: 2 Question: What are the details of project mark detail with ID {id}?", "INDEX: 5 Question: Can you show me the information about project mark with ID {id}?", "INDEX: 8 Question: What is the reco item with ID {id}?", "INDEX: 9 Question: Was my rule deletion successful, and what is the status code?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What is the provider subject ID associated with my account?", "INDEX: 3 Question: Can you retrieve the provider subject ID for my account with provider name XYZ and provider subject ID ABC?", "INDEX: 5 Question: What is the provider subject ID linked to my identity with subject ID DEF?", "INDEX: 6 Question: Can you fetch the provider subject ID for my identity with provider name GHI and provider subject ID JKL?"]}
+{"questions": ["INDEX: 0 Question: What is the current filter configuration?", "INDEX: 1 Question: What is the status of the Hystrix path?", "INDEX: 2 Question: What is the instance status of my service registry?"]}
+{"questions": ["INDEX: 4 Question: What are the comunas associated with a municipio?", "INDEX: 7 Question: What are the municipios in a provincia?"]}
+{"questions": ["INDEX: 3 Question: What is the status of my promo code?", "INDEX: 4 Question: Can you tell me the campaign description associated with my promo code?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is the status of my login code?"]}
+{"questions": ["INDEX: 2 Question: What is the status of my configuration initialization?", "INDEX: 6 Question: What is the message and status of my updated configuration?", "INDEX: 7 Question: Is my shard container validated successfully?", "INDEX: 8 Question: What is the result of validating my shard file system?", "INDEX: 10 Question: What is the status of appending to my file?", "INDEX: 11 Question"]}
+{"questions": ["INDEX: 9 Question: Can you show me the details of my export request with ID [request-id]?", "INDEX: 10 Question: What are the import details for my request with ID [request-id]?"]}
+{"questions": ["INDEX: 0 Question: What is the status of my account migration?", "INDEX: 2 Question: What is my tracking ID for the downloaded document?", "INDEX: 3 Question: Is my FATCA declaration registered successfully?"]}
+{"questions": ["INDEX: 0 Question: No match found", "INDEX: 1 Question: No match found", "INDEX: 2 Question: No match found"]}
+{"questions": ["INDEX: 0 Question: What are the application base URLs and bootstrapper URLs for my net-zone apps?"]}
+{"questions": ["INDEX: 1 Question: Can I update my client information with a new secret?", "INDEX: 2 Question: How can I refresh my token to access the system?", "INDEX: 3 Question: What happens if I revoke my user token?", "INDEX: 4 Question: Can I delete my current session and start fresh?", "INDEX: 5 Question: How do I generate a custom token for a specific audience?", "INDEX: 6 Question: What is the process for creating a system token with my client ID and secret?", "INDEX: 7 Question: How can I obtain a user token to access protected resources?", "INDEX: 8 Question: Can I add an external token to my user account for additional authentication?", "INDEX: 9 Question: Is my token still valid, or do I need to request a new one?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the available net-zones and their corresponding application base URLs?"]}
+{"questions": ["INDEX: 0 Question: What are all the stores in the system?", "INDEX: 1 Question: Can you list all stores with pagination?", "INDEX: 2 Question: Which store has a specific ID or regional ID?", "INDEX: 3 Question: Who is the consultant responsible for a particular store?", "INDEX: 4 Question: What are the details of a specific store?", "INDEX: 5 Question: What are the sellout channels for a particular participant and store?", "INDEX: 6 Question: Which sellout channels are available for a specific store?", "INDEX: 7 Question: What is the meta data for CPF registration in a specific store?", "INDEX: 8 Question: Is opt-in enabled for a specific store?", "INDEX: 9 Question: Which stores are near a specific postal code?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the details of my recent purchase with unique transaction ID?", "INDEX: 1 Question: Can you show me my purchase history associated with my email ID?"]}
+{"questions": ["INDEX: 3 Question: What carreira has the ID 123?", "INDEX: 4 Question: What complemento profissional has the ID 456?", "INDEX: 5 Question: What conta has the ID 789?", "INDEX: 6 Question: What contato telefone has the ID 901?", "INDEX: 7 Question: What documento has the ID \"abc\"?", "INDEX: 8 Question: What endereco has the ID 234?", "INDEX: 9 Question: What escolaridade has the ID 567?", "INDEX: 10 Question: Can I delete the evento with ID \"def\"?", "INDEX: 11 Question: What experiencia has the ID 890?", "INDEX: 12 Question: How do I update contatos for homecare with IDHomeCare 123?", "INDEX: 13 Question: How do I update enderecos for homecare with IDHomeCare 456?", "INDEX: 14 Question: What homecare has the ID 789?", "INDEX: 15 Question: How do I update contatos for plano saude with IDPlanoSaude 901?", "INDEX: 16 Question: How do I update enderecos for plano saude with IDPlanoSaude 234?", "INDEX: 17 Question: What plano saude has the ID 567?", "INDEX: 18 Question: What eventos does profissional with ID 890 have?", "INDEX: 19 Question: Can I delete the evento with ID 123 from profissional with ID 456?", "INDEX: 20 Question: What profissional has the ID 789?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: How many URLs do I have for a specific carrier and email address?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 7 Question: What licenses does account {id} have?", "INDEX: 8 Question: What is the information for account {accountId}?", "INDEX: 9 Question: What license has ID {id}?", "INDEX: 11 Question: Is user {username} a superuser?", "INDEX: 12 Question: What is the SalesForce information about user {username}?", "INDEX: 13 Question: Which tenants have product {product} licenses?", "INDEX: 14 Question: Can I switch to tenant {id}?", "INDEX: 15 Question: What is the SalesForce account information for {accountId}?", "INDEX: 16 Question: What is the history of internal user {internalUserName}?", "INDEX: 17 Question: What changes have been made to tenants in the last {timeInterval} seconds?", "INDEX: 18 Question: What is the history of tenant {id}?", "INDEX: 19 Question: Who are the users for tenant {id}?", "INDEX: 20 Question: Does user {username} still have access to tenant {tenant}?", "INDEX: 21 Question: Which tenants does user {username} have access to?", "INDEX: 22 Question: Can user {username} switch to tenant {tenantId}?", "INDEX: 25 Question: Is {newUser} a superuser now?", "INDEX: 26 Question: Does tenant {id} have data access?", "INDEX: 27 Question: What tenants are associated with account {accountId}?", "INDEX: 28 Question: Are accounts {parent_id} and {child_id} related?", "INDEX: 31 Question: Is internal user {id} deleted?", "INDEX: 32 Question: Is internal user {internalUserName} deleted?", "INDEX: 33 Question: Are accounts {parent_id} and {child_id} no longer related?", "INDEX: 34 Question: Does superuser {username} still have access to tenant {tenant}?"]}
+{"questions": ["INDEX: 0 Question: Which samples were accepted or excluded from the analysis?", "INDEX: 1 Question: Can you tell me the parameter name and sample ID associated with a specific hit chart?", "INDEX: 2 Question: What is the status of my sample submission, was it accepted or excluded?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Have I started watching a live stream?", "INDEX: 1 Question: Can I stop watching a live stream?"]}
+{"questions": ["INDEX: 0 Question: What is the score data I just submitted?"]}
+{"questions": ["INDEX: 14 Question: What is the admin ID I just created?", "INDEX: 16 Question: What is the file ID of the file I just uploaded?", "INDEX: 17 Question: What are my login credentials for the admin dashboard?", "INDEX: 19 Question: What role did I just assign to myself?", "INDEX: 22 Question: What are my current user settings?", "INDEX: 23 Question: What is the validation status of the request I just updated?", "INDEX: 24 Question: What action did I just take on the request?"]}
+{"questions": ["INDEX: 2 Question: What is the status of my line creation request?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What product codes have been updated in the move list?", "INDEX: 5 Question: Which zone has the most picks with a specific product code?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Can you show me a list of narrations with their corresponding Arabic and English translations?", "INDEX: 1 Question: What are the most significant terms related to \"machine learning\" in the database?", "INDEX: 2 Question: What are the top terms that start with \"artificial intelligence\"?"]}
+{"questions": ["INDEX: 2 Question: What emails have a specific status in my campaign?", "INDEX: 3 Question: How many errors of a certain type did I get in my campaign?", "INDEX: 4 Question: What is the configuration of my week schedule with ID {week_schedule_id}?", "INDEX: 5 Question: Can you set up my week schedule with ID {week_schedule_id} to have days {day_1} to {day_7}?", "INDEX: 6 Question: How do I delete my week schedule with ID {week_schedule_id}?", "INDEX: 7 Question: How do I activate my week schedule with ID {week_schedule_id}?", "INDEX: 8 Question: Can you set up a reverse DNS for my domain {domain_net}?", "INDEX: 9 Question: What emails are in my email group with ID {email_group_id}?", "INDEX: 10 Question: How do I add the email {myemail_at_domain_net} to my email group with ID {email_group_id}?", "INDEX: 11 Question: How do I remove the email {myemail_at_domain_net} from my email group with ID {email_group_"]}
+{"questions": ["INDEX: 0 Question: What content is associated with page identifier \"example-page\"?", "INDEX: 1 Question: Can you retrieve the content details for content ID \"12345\"?"]}
+{"questions": ["INDEX: 2 Question: What is the status of my bet slip?", "INDEX: 3 Question: Can you report on my bets by status?", "INDEX: 7 Question: What events are available for this league ID?", "INDEX: 8 Question: What are the details of event ID 1234?", "INDEX: 10 Question: How many menu items do I have in the given time range?", "INDEX: 12 Question: What is the status of my waiting bet with ID 1234?", "INDEX: 14 Question: Can you search for leagues or events that match \"football\"?"]}
+{"questions": ["INDEX: 2 Question: What is the object ID of the dashboard I'm looking at?", "INDEX: 5 Question: What is the redirect URL for supplier trading partner key 12345?", "INDEX: 8 Question: Was my MicroStrategy user account successfully deleted for trading partner key 12345 and user ID abcdefg?", "INDEX: 9 Question: Did the partnership deletion succeed for retailer trading partner key 12345?", "INDEX: 12 Question: Was the supplier tier creation successful for retailer trading partner key 12345?"]}
+{"questions": ["INDEX: 0 Question: What is my authentication token?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What was the error message in my last log entry?", "INDEX: 3 Question: Can you show me the details of my recent wire log activity?", "INDEX: 5 Question: How many objects are stored in my S3 bucket for asset ID ABC123?"]}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: How many records were initialized in the last operation?", "INDEX: 4 Question: What was the status of the initialization process for the given number of records?"]}
+{"questions": ["INDEX: 1 Question: What happens when I delete a segment with ID {id}?"]}
+{"questions": ["INDEX: 3 Question: What is the status code of my provisioning request for brandCode {brandCode} and region {region}?", "INDEX: 4 Question: What is the status code value of my on-demand provisioning job with ID {jobid}?", "INDEX: 5 Question: What is the status code of my simulated provisioning request for brandCode {brandCode} and region {region}?"]}
+{"questions": ["INDEX: 0 Question: Which floors have been updated in the site layout for business unit {buId}?"]}
+{"questions": ["INDEX: 2 Question: Can I provision a certificate with a specific provision type and CertificateId?", "INDEX: 3 Question: What is the current configuration of device {device_id}, including its hardware address, decryption key, position on vehicle, firmware version, and last changed date?", "INDEX: 4 Question: What are the reported and desired configurations of device {device_id}, including its hardware address, decryption key, position on vehicle, firmware version, and last changed date?", "INDEX: 7 Question: What is the current firmware metadata for device {device_id}?", "INDEX: 8 Question: What are the security keys associated with device {device_id}, including their types, values, and names?", "INDEX: 11 Question: What firmware versions are available for device type wem, along with their targets, creation dates, and S3 URLs?", "INDEX: 12 Question: Which devices are associated with node {node_id}, including their IDs and node IDs?", "INDEX: 15 Question: What is the ID of the new device created under node {node_id} for device type wem, along with its node ID?", "INDEX: 16 Question: What are the details of the newly commissioned gateway under node {node_id}, including its ID, root CA, certificate, private key, and MQTT endpoint?"]}
+{"questions": ["INDEX: 0 Question: What is the ID of the event I just copied to next week?", "INDEX: 1 Question: Can you show me the details of the event with ID 1?", "INDEX: 3 Question: Was my review of event 123 successfully submitted?", "INDEX: 4 Question: Did I successfully RSVP to event 456?", "INDEX: 5 Question: Was I able to un-RSVP from event 789?"]}
+{"questions": ["INDEX: 0 Question: What is my IP address and location information?", "INDEX: 1 Question: Can you provide detailed location information for a given IP address?", "INDEX: 2 Question: What city and country does an IP address belong to?", "INDEX: 3 Question: What is the latitude, longitude, and timezone of a specific IP address?", "INDEX: 5 Question: What is the continent code and subdivision list for a given IP address?", "INDEX: 6 Question: Can you provide detailed location information including postal code and result for an IP address?"]}
+{"questions": []}
+{"questions": ["(Note: I assume I should respond with one question per endpoint, in the format `INDEX: [line index] Question: [insert synthetic question]`)"]}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What resources have been observed on site {siteId}?", "INDEX: 5 Question: Can I export a CSV of resource data for site {siteId}?", "INDEX: 14 Question: Is consent geo-enabled for site {siteId}?", "INDEX: 15 Question: Is consent geo-enabled for site GUID {siteGuid}?", "INDEX: 16 Question: Is consent geo-enabled for UCP ID {ucpId}?", "INDEX: 17 Question: What vendor information is associated with vendor ID {vendorId}?"]}
+{"questions": ["INDEX: 3 Question: What is my profile information?", "INDEX: 6 Question: What is my login token?", "INDEX: 7 Question: What is my OTP token?", "INDEX: 10 Question: What is my user information?", "INDEX: 11 Question: What is the validator information for a given pubkey?", "INDEX: 13 Question: What are the details of an eth1 transaction?", "INDEX: 14 Question: What is the index of a validator with a given pubkey?", "INDEX: 16 Question: What is the balance history of a validator with a given pubkey?", "INDEX: 17 Question: What is the activation status of a validator with a given pubkey?", "INDEX: 18 Question: What are the pubkeys and signatures for a batch deposit?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 14 Question: Can you send me an email with my report data?", "INDEX: 22 Question: What partners are associated with my user ID?", "INDEX: 23 Question: What carrier names are available for my practice?", "INDEX: 30 Question: What is the clinical schedule for my practice?", "INDEX: 32 Question: What is my usage report?", "INDEX: 34 Question: Can you send me a CSR report for my practice and user ID?", "INDEX: 35 Question: What are the open surgery PCR reports for this month, year, and practice?", "INDEX: 41 Question: What is the verification status of my patient validation?", "INDEX: 43 Question: How do I hide my usage report for my user ID?"]}
+{"questions": ["INDEX: 2 Question: Why was my ad request denied?", "INDEX: 3 Question: What was the outcome of my event impression?"]}
+{"questions": []}
+{"questions": ["INDEX: 5 Question: What is the status of alarm with ID {id}?", "INDEX: 6 Question: Are there any alerts for asset with ID {id} and type {alarm_ types}?", "INDEX: 8 Question: What is the customer information for customer with ID {id}?", "INDEX: 9 Question: Is my login token {token} valid?", "INDEX: 10 Question: What is the content of message with ID {id}?", "INDEX: 13 Question: What is the GPS signal strength for asset with ID {id}?", "INDEX: 14 Question: What trips are associated with asset with ID {id}?", "INDEX: 15 Question: What logs are available for asset with ID {id}?", "INDEX: 16 Question: What is the geolocation data for latitude {lat} and longitude {lng}?", "INDEX: 17 Question: Are there any alarms of type {alarm_ types} for asset with ID {id}?", "INDEX: 18 Question: What trip with ID {tripId} is associated with asset with ID {id}?", "INDEX: 19 Question: Has alert with ID {id} been signed?", "INDEX: 20 Question: Is asset with ID {id} currently assigned to someone?", "INDEX: 21 Question: Is asset with ID {id} currently assigned to me?", "INDEX: 22 Question: Do I own trip with ID {id}?", "INDEX: 23 Question: Have I disowned trip with ID {id}?", "INDEX: 24 Question: Has cost with ID {cost_ id} been deleted from trip with ID {id}?", "INDEX: 26 Question: What costs are associated with trip with ID {id}?", "INDEX: 27 Question: Is my push notification token {token} still valid?"]}
+{"questions": ["INDEX: 3 Question: What is my username?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: Can I access product details for product ID {productId} in course {courseId}?", "INDEX: 2 Question: What is the cached value for key {key} in Redis Cache?", "INDEX: 3 Question: What is the status of PDF book processing for product ID {productId}?", "INDEX: 4 Question: Do I have a token to access product {productId}?", "INDEX: 5 Question: What is the cached value for pattern {key} in Redis Cache?", "INDEX: 6 Question: Can I get details about course {courseId} and its associated product {productId}?", "INDEX: 7 Question: How do I clear the Redis Cache for key {key}?", "INDEX: 8 Question: How do I clear the Redis Cache for pattern {key}?", "INDEX: 9 Question: How do I send a notification to recipients with event type {eventType} and product type {productType}?", "INDEX: 10 Question: Can I push PDF book processing for product ID {productId} to S3 with certification path {certPath}?"]}
+{"questions": ["INDEX: 1 Question: What is my latest license code and API key for a specific site?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Is my email already on the waitlist?"]}
+{"questions": ["INDEX: 0 Question: What topics are available for launch in a specific module and section?", "INDEX: 1 Question: Who are the members of a specific context with a given UUID?", "INDEX: 2 Question: (No question can be generated as there is no response body)"]}
+{"questions": ["INDEX: 0 Question: Can I add a new user with name \"John Doe\" and email \"johndoe@example.com\"?", "INDEX: 1 Question: How do I delete a user with ID 123?", "INDEX: 2 Question: Can I update the cargo of user 456 to \"Manager\"?", "INDEX: 3 Question: What is the list of all users in the system?", "INDEX: 4 Question: Can you show me the paginated list of users who have \"admin\" in their cargo?", "INDEX: 5 Question: Which users have a cargo ID of 789?", "INDEX: 6 Question: How do I deactivate users with IDs 111, 222, and 333?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 7 Question: What filters are available for a carrier, device name, locale, and sku?", "INDEX: 11 Question: How do I delete an asset metadata by carrier, device name, and sku?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the access rights for a specific media asset ID?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the instance ID of the service I'm monitoring?", "INDEX: 1 Question: Can you tell me the instance ID associated with the metrics of my service?"]}
+{"questions": ["INDEX: 0 Question: What is the converted quantity value if I have 10 units of \"unitFrom\" and want to convert it to \"unitTo\"?", "INDEX: 1 Question: If I'm converting 20 units of \"unitFrom\" to \"unitTo\", what will be the resulting quantity value?", "INDEX: 2 Question: Can you tell me the converted quantity values for a list of quantities with their respective units, if I want to convert them from \"unitFrom\" to \"unitTo\"?", "INDEX: 3 Question: If I have multiple quantities with their respective units and I want to convert them from \"unitFrom\" in one namespace to \"unitTo\" in another namespace, what will be the resulting quantity values?"]}
+{"questions": ["INDEX: 0 Question: Can you retrieve my account info?", "INDEX: 1 Question: How do I initialize my account?", "INDEX: 2 Question: Is this operator valid?", "INDEX: 3 Question: How do I get an authentication token?", "INDEX: 4 Question: What's the chat log for this conversation?", "INDEX: 5 Question: How do I send a satisfaction survey response?", "INDEX: 6 Question: What's my geolocation information?", "INDEX: 7 Question: How do I set my chat ID?", "INDEX: 8 Question: Can you insert a new CRM record for me?", "INDEX: 9 Question: How do I redirect to Leo?", "INDEX: 10 Question: How do I redirect to Info360?", "INDEX: 11 Question: How do I redirect to the ticket system?", "INDEX: 12 Question: Can you search for tickets with this ID or email?", "INDEX: 13 Question: How do I insert a new note into a ticket?"]}
+{"questions": ["INDEX: 0 Question: What is the status of my lambda run with ID [lambda_run_id]?", "INDEX: 2 Question: How many mementos did I process in my last lambda run for memento [memento_name]?", "INDEX: 3 Question: What was the execution time of my memento [memento_name]?"]}
+{"questions": ["INDEX: 0 Question: What is my authentication token?", "INDEX: 1 Question: What is the status of my transition request?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is the login of the user I just searched?", "INDEX: 2 Question: What is the name of the movie I want to update?", "INDEX: 5 Question: Is the user with login \"example\" activated?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What is the display name of the cross connect group associated with my virtual circuit?"]}
+{"questions": ["INDEX: 1 Question: What happens when I delete a value with ID 5?"]}
+{"questions": ["INDEX: 1 Question: Who sent me felicitations this month?", "INDEX: 3 Question: How many likes does my felicitation have?", "INDEX: 5 Question: What is the email address of the person with ID {personUid}?"]}
+{"questions": ["INDEX: 2 Question: What is the API key for my new client application?", "INDEX: 3 Question: What is the ID of the updated client with database XYZ?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What is the GUID associated with my user information?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the scores I've received so far?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: No match", "INDEX: 1 Question: No match", "INDEX: 2 Question: No match", "INDEX: 3 Question: No match"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What vehicle class does my powersports info belong to?", "INDEX: 4 Question: Which make of powersports vehicles is available in my area?", "INDEX: 7 Question: What category does my powersports model belong to?", "INDEX: 8 Question: What is the name of the make that my powersports model belongs to?", "INDEX: 9 Question: In what year was my powersports vehicle made?"]}
+{"questions": ["INDEX: 4 Question: Who is the current operator?", "INDEX: 5 Question: What is the widget ID for my current connection?", "INDEX: 12 Question: How do I delete an operator with ID {id}?", "INDEX: 14 Question: Can you reset the password for operator {id}?", "INDEX: 26 Question: How do I update user information for user {id}?", "INDEX: 30 Question: Can you block a user with ID {userId}?", "INDEX: 31 Question: Can you unblock a user with ID {userId}?", "INDEX: 34 Question: How do I delete a widget with ID {widgetId}?", "INDEX: 37 Question: What is the status of my widget with ID {widgetId}?"]}
+{"questions": ["INDEX: 1 Question: What happened to the user with ID {userid}?"]}
+{"questions": ["INDEX: 4 Question: What is the status of the station with ID pocId?", "INDEX: 5 Question: Can I pair a device with the station having ID pocId?", "INDEX: 7 Question: What is the visit request associated with ID tytoId?", "INDEX: 8 Question: What is the review status for the visit with ID tuoId?", "INDEX: 9 Question: What is the current status of the visit with ID visitId?"]}
+{"questions": ["INDEX: 1 Question: What is my account ID?", "INDEX: 3 Question: What is my password recovery code?", "INDEX: 4 Question: What is my JWT token and account information after signing in?", "INDEX: 5 Question: What is my JWT token and account information after force signing in?", "INDEX: 15 Question: What is my user info, including nickname and phone number?", "INDEX: 16 Question: What is the verification code for my phone number?", "INDEX: 19 Question: What are the video IDs associated with my account?"]}
+{"questions": ["INDEX: 1 Question: What is the template ID associated with query group ID?", "INDEX: 2 Question: What are the attribute names and values for template ID?", "INDEX: 3 Question: What is the data source for template variable with ID?"]}
+{"questions": ["INDEX: 1 Question: What is the status of my subscription by document number?", "INDEX: 2 Question: What is my user code after registration?", "INDEX: 3 Question: What is my channel and ID information in my user profile?"]}
+{"questions": ["INDEX: 0 Question: What is my authentication token?", "INDEX: 1 Question: Can I get an application summary?", "INDEX: 2 Question: Was the application deletion successful?"]}
+{"questions": ["INDEX: 1 Question: What are the IDs of entities that were created in my workspace?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Who are all the customers in our database?"]}
+{"questions": ["INDEX: 0 Question: Where can I download the file to reset my password?"]}
+{"questions": ["INDEX: 2 Question: What learning objectives have I worked on recently?", "INDEX: 3 Question: How many lessons did I complete last week?", "INDEX: 4 Question: What is my overall progress in all subjects?", "INDEX: 7 Question: What are the details of lesson {lessonId} in school {schoolId} and subject group {subjectGroupId}?", "INDEX: 8 Question: What are my metrics for subdomain {subdomainId} in subject {subjectId}?", "INDEX: 9 Question: How am I doing in subject group {subjectGroupId}?", "INDEX: 10 Question: What is my progress in subject {subjectId}?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What is my customer information?", "INDEX: 4 Question: Have I bound my mobile number to my account?", "INDEX: 5 Question: Who are my journeyers?", "INDEX: 6 Question: Can you save my journeyer information?", "INDEX: 8 Question: What are the details of my order?", "INDEX: 9 Question: How much does it cost to travel with this many people?", "INDEX: 10 Question: Do I have a payment sign for my order?", "INDEX: 11 Question: What orders do I have as a customer?", "INDEX: 12 Question: Can you show me the details of my order?", "INDEX: 13 Question: Can I close my order?", "INDEX: 14 Question: Can I get a refund for my order?", "INDEX: 15 Question: How many unread messages do I have?", "INDEX: 16 Question: Can I save my opinion about this product?", "INDEX: 17 Question: What are the details of this product?", "INDEX: 18 Question: What is the chang ci information for this product?"]}
+{"questions": ["INDEX: 4 Question: What is the status of the station with ID pocId?", "INDEX: 5 Question: Can I pair a device with the station having ID pocId?", "INDEX: 7 Question: What is the visit request associated with ID tytoId?", "INDEX: 8 Question: What is the review status for the visit with ID tytoId?", "INDEX: 9 Question: What is the current status of the visit with ID visitId?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: Can I upload a new file to connector with identifier \"XYZ\" and version number \"1.2\"?", "INDEX: 1 Question: How can I download the file named \"example.txt\" from connector with identifier \"ABC\" and version number \"3.4\"?", "INDEX: 2 Question: Where can I find the file located at relative path \"/path/to/file.txt\"?"]}
+{"questions": ["INDEX: 3 Question: Is the taxa with ID {id} still active?", "INDEX: 4 Question: Can I reactivate the taxa with ID {id}?"]}
+{"questions": ["INDEX: 2 Question: What is the status code of my person name validation request?"]}
+{"questions": ["INDEX: 2 Question: What is the routing key associated with my source ID?", "INDEX: 3 Question: Can I delete a card from my member profile using this source ID and routing key?", "INDEX: 4 Question: What offers do I have available based on my source ID and routing key?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 4 Question: What is the ID of the resource I just created?", "INDEX: 5 Question: Can you give me the ID of the new resource generated from the S3 object?", "INDEX: 7 Question: What is the ID of the resource I grabbed using the grab endpoint?", "INDEX: 8 Question: What is the ID of the resource I uploaded to the server?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What was the title of the email I just sent from Freixchange?"]}
+{"questions": ["INDEX: 0 Question: What are my recent scores?"]}
+{"questions": ["INDEX: 2 Question: What is the status of my service with ID {serviceId} after revoking access?", "INDEX: 4 Question: What is the client data associated with {clientData} in the {domainName} domain and version {domainVersion}?", "INDEX: 5 Question: What system response data is stored under the key {systemResponseKey} in the {domainName} domain and version {domainVersion}?"]}
+{"questions": ["INDEX: 1 Question: Do I have access to this resource?"]}
+{"questions": []}
+{"questions": ["INDEX: 3 Question: What is the authorization model for my access request?", "INDEX: 5 Question: Can you confirm my access with the provided model details?"]}
+{"questions": ["INDEX: 6 Question: What is my billing start date and plan ID?", "INDEX: 7 Question: Is my customer model empty or does it have a reference?", "INDEX: 8 Question: Can you show me my customer model and view name?"]}
+{"questions": ["INDEX: 0 Question: Can I register with email address \"example@example.com\" and username \"johnDoe\"?", "INDEX: 1 Question: What is my login token for username \"janeDoe\" and password \"mysecretpassword\"?", "INDEX: 2 Question: Is user \"adminUser\" enabled?", "INDEX: 3 Question: Can I disable user \"inactiveUser\"?", "INDEX: 4 Question: How do I reset the password for user \"forgottenPassword\"?", "INDEX: 5 Question: What is my new access token after refreshing with refresh token \"myrefreshtoken\"?", "INDEX: 6 Question: What is the current value of the setting?", "INDEX: 7 Question: Can I delete the value with ID 123?"]}
+{"questions": ["INDEX: 0 Question: What is the score I just submitted?"]}
+{"questions": ["INDEX: 6 Question: What type of metadata does a specific notification user have?", "INDEX: 17 Question: What is the status code value for a user with a specific user ID or email address?"]}
+{"questions": ["INDEX: 0 Question: What causes are near my location?", "INDEX: 1 Question: Which circles have posts with a specific keyword?", "INDEX: 2 Question: Can you show me all posts from users in my network?", "INDEX: 3 Question: Are there any projects related to my search query?", "INDEX: 4 Question: What companies match my search criteria?", "INDEX: 5 Question: Who are the individuals that work at a company I'm interested in?"]}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What customizations do I have for dashboards, rssFeeds, searches, tags, and labels in my company?"]}
+{"questions": ["INDEX: 0 Question: What is the score I just submitted?"]}
+{"questions": ["INDEX: 0 Question: What is the latest file version for a specific namespace and fileId?", "INDEX: 1 Question: Can you retrieve the file details for a specific namespace, fileId, and version?", "INDEX: 2 Question: After uploading a new file version, what is the updated file ID and namespace?", "INDEX: 5 Question: How can I access a file with a specific path, and what is its corresponding file ID, namespace, and URL with SAS?"]}
+{"questions": ["INDEX: 4 Question: What is the status of the station with ID pocId?", "INDEX: 5 Question: Can I pair a device with the station having ID pocId?", "INDEX: 7 Question: What is the visit request associated with ID tytoId?", "INDEX: 8 Question: What is the review status for the visit with ID tytoId?", "INDEX: 9 Question: What is the current status of the visit with ID visitId?"]}
+{"questions": ["INDEX: 0 Question: What is the score I just submitted?"]}
+{"questions": []}
+{"questions": ["INDEX: 22 Question: What cache keys need to be removed from the cache store for a given request ID and cache app name?"]}
+{"questions": ["INDEX: 2 Question: What is the signed URL for image rendition of asset with IDs?", "INDEX: 3 Question: What is the signed URL for original asset with IDs?", "INDEX: 4 Question: What is the signed URL for preview of asset with IDs?", "INDEX: 5 Question: What is the signed URL for thumbnail of asset with IDs?", "INDEX: 14 Question: What happens when I delete a folder with ID?"]}
+{"questions": ["INDEX: 2 Question: What buildings have a specific project ID?", "INDEX: 5 Question: What are the details of the buildings associated with a particular project ID?"]}
+{"questions": ["INDEX: 0 Question: What is the status of my audit event?", "INDEX: 1 Question: Did I receive an answer to my legal logging question?", "INDEX: 2 Question: Is my legal logging request still unanswered?", "INDEX: 3 Question: Was there an exception in my legal logging request?", "INDEX: 4 Question: What was the outcome of my legal logging inquiry?", "INDEX: 5 Question: What audit logs are available for a specific time period?", "INDEX: 6 Question: Can I search for audit logs using certain criteria?", "INDEX: 7 Question: How do I authenticate with OpenID Connect?", "INDEX: 8 Question: What is the status code of my KPI logging request?", "INDEX: 9 Question: How can I view legal logging details for a specific reference?", "INDEX: 10 Question: Can I search for legal logs using certain criteria?"]}
+{"questions": ["INDEX: 12 Question: What is my avatar for user ID {id}?", "INDEX: 17 Question: What is my horoscope reading for pillar {pillar}?", "INDEX: 19 Question: Can you show me notification {id}?", "INDEX: 24 Question: What is question {id} about?", "INDEX: 26 Question: Who is my friend"]}
+{"questions": []}
+{"questions": ["INDEX: 5 Question: What is the current value of the metric named \"requiredMetricName\"?"]}
+{"questions": []}
+{"questions": ["INDEX: 8 Question: What is my default credit card?", "INDEX: 10 Question: Can I delete my payment card with ID {cardId}?"]}
+{"questions": ["INDEX: 0 Question: What is the Embedded Resource associated with file name {fileName}?", "INDEX: 1 Question: What is the service URL for service ID {serviceId}?", "INDEX: 2 Question: What is the authentication URL for service ID {serviceId} without auth header validation?", "INDEX: 3 Question: Can I delete endpoint with ID {id}?", "INDEX: 4 Question: What are the endpoints associated with IDs {ids}?", "INDEX: 5 Question: What is the newly created endpoint's details after posting app {app}, bounded context {boundedContext}, short service name {shortServiceName}, and major version {majorVersion}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 4 Question: What chaincodes are available on channel {channelName}?", "INDEX: 7 Question: What is the status of chaincode {chaincodeName} on channel {channelName}?", "INDEX: 8 Question: What is the content of block {blockId} on channel {channelName}?", "INDEX: 9 Question: What is the transaction {trxnId} details on channel {channelName}?", "INDEX: 10 Question: What are the blocks available on channel {channelName}?", "INDEX: 11 Question: What is the status of channel {channelName}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What happens when I ingest Obvius logger measurements?"]}
+{"questions": ["INDEX: 0 Question: What is the status of my join request?", "INDEX: 1 Question: Did my message get delivered successfully?"]}
+{"questions": ["INDEX: 0 Question: Is the application healthy?", "INDEX: 1 Question: What information does the application provide about itself?"]}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: What is the proximity of my last session?", "INDEX: 3 Question: How many sessions do I have as a user?", "INDEX: 4 Question: What events occurred in my session with ID {sid}?", "INDEX: 6 Question: What devices am I currently using?", "INDEX: 7 Question: What was the activity and coordinates of my last event?", "INDEX: 8 Question: What are the positions around me within a certain distance?", "INDEX: 9 Question: What events occurred in the session with ID {sid} that I'm interested in?", "INDEX: 10 Question: What messages were sent during the session with ID {sid}?"]}
+{"questions": ["INDEX: 0 Question: What is the status of my run log with ID {id}?", "INDEX: 2 Question: Was my service with ID {id} successfully deleted?"]}
+{"questions": ["INDEX: 1 Question: What is the module and type of the Life Cycle Action named \"MyAction\" in my tenant?"]}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 2 Question: Can you give me a signed URL for an image rendition of asset with ID {ids}?", "INDEX: 3 Question: How can I get a signed URL to download the original file of asset with ID {ids}?", "INDEX: 4 Question: What is the signed URL to preview the asset with ID {ids}?", "INDEX: 5 Question: Can you provide a signed URL to access the thumbnail of asset with ID {ids}?"]}
+{"questions": ["INDEX: 4 Question: What is the status of the station with ID pocId?", "INDEX: 5 Question: Can I pair a device with the station having ID pocId?", "INDEX: 7 Question: What are the details of my visit with ID tytoId?", "INDEX: 8 Question: What is the review status of my visit with ID tytoId?", "INDEX: 9 Question: What is the current status of my visit with ID visitId?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the entity with ID {id}?", "INDEX: 1 Question: Can you list all entities that match my search criteria?", "INDEX: 3 Question: What is the evaluation result for entityId {entityId} and source {source}?", "INDEX: 4 Question: What are the details of the evaluation with ID {id}?", "INDEX: 5 Question: Can you show me all field classifications?", "INDEX: 6 Question: What are the field errors associated with FieldClassificationId {FieldClassificationId}?", "INDEX: 7 Question: Are there any file errors for FileClassificationId {FileClassificationId} and Active status {Active}?", "INDEX: 8 Question: What is the file with ID {id}?", "INDEX: 9 Question: Can you update the file with fileId {fileId} to have a new status?", "INDEX: 10 Question: Who are all the risk analysts that match my search criteria?"]}
+{"questions": ["INDEX: 0 Question: What is the current status of my replenishment settings?", "INDEX: 1 Question: What is the anchor value for the last sync event in my business unit?"]}
+{"questions": ["INDEX: 4 Question: Can you give me a token to access the S3 bucket?", "INDEX: 5 Question: How can I get a presigned URL for uploading a file to S3?"]}
+{"questions": ["INDEX: 5 Question: What is the result of invoking the method {methodName} on interface {interfaceName} in application {application}?"]}
+{"questions": ["INDEX: 0 Question: What is the predicted probability of my score?"]}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What are the search results for a hash value of {hash} in NSRL RDS?", "INDEX: 1 Question: Can you provide details about a file with a hash value of {hash}?", "INDEX: 2 Question: Is a file with a hash value of {hash} known to be malicious according to NSRL RDS bloom filter?", "INDEX: 3 Question: What is the known level of a file with a hash value of {hash} in both hashdd and NSRL RDS?", "INDEX: 4 Question: Can you tell me if a file with a hash value of {hash} is known to be malicious according to NSRL RDS?", "INDEX: 5 Question: What is the known level of a file with a hash value of {hash} in both hashdd and NSRL RDS?"]}
+{"questions": []}
+{"questions": ["INDEX: 1 Question: What products have been updated in the ignore list since my last anchor?", "INDEX: 3 Question: Which moves have been updated for product code 1234 since my last anchor?", "INDEX: 5 Question: What is the current quantity of product code 5678 in zone A?"]}
+{"questions": ["INDEX: 5 Question: What is the city and country associated with IP address {ip}?", "INDEX: 6 Question: Can you provide me with the geographic location details for IP address {ip}?"]}
+{"questions": []}
+{"questions": []}
+{"questions": []}
+{"questions": ["INDEX: 0 Question: What is the status of my asynchronous query with request ID [requestId] and method [method]?", "INDEX: 1 Question: What patient information can I retrieve using card ID [cardId], ID card number [IdCardNo], card type [cardType], and user name [userName]?"]}
+{"questions": ["INDEX: 2 Question: What is the category of my shopping list with ID {id}?", "INDEX: 3 Question: What is the title of the item I just added to list {listId}?", "INDEX: 4 Question: What is the title of item {itemId} in my shopping list {listId}?"]}
+{"questions": ["INDEX: 8 Question: What is my email address and login credentials after registering as a new user?", "INDEX: 9 Question: Can you update my profile information with my new Eurodecision ID and login details?"]}
+{"questions": ["INDEX: 8 Question: What is the status of my loan request?", "INDEX: 9 Question: Can you update my loan information with the new details I provided?", "INDEX: 10 Question: How can I verify my loan request information for version 3 of the API?", "INDEX: 12 Question: What are the details of my registered account?"]}
+{"questions": []}
+{"questions": ["2. INDEX: 2 Question: What are the email addresses I need to send this template to?", "3. INDEX: 3 Question: What is the name of the email template I just uploaded?"]}
+{"questions": []}

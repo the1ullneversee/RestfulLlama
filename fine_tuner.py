@@ -1,11 +1,11 @@
 import torch
-from transformers import (
+from inference import (
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
 )
 from peft import PeftModel, LoraConfig, prepare_model_for_kbit_training, get_peft_model
-from transformers import AutoModelForCausalLM
+from inference import AutoModelForCausalLM
 import os 
 import wandb
 from trl import SFTTrainer

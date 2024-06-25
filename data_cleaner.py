@@ -1,23 +1,35 @@
-import os
-import shutil
+import hashlib
 import json
 
-base_file = 'swagger-files/rest_fine_tune.jsonl'
+def create_path_hash(paths: list):
+    concat = ''.join(paths)
+
+    hash_object = hashlib.sha256(concat.encode())
+    hash_hex = hash_object.hexdigest()
+    return hash_hex
 
 
-with open(base_file) as file:
-    with open('rest_fine_tune_cleaned.jsonl', mode='w') as data_file:
-        for file_line in file.readlines():
-            line_json = json.loads(file_line)
-            question: str = line_json['question']
-            answer: str = line_json['answer']
-            end_token = '[/INST]'
-            answer = answer[answer.find(end_token) + len(end_token):]
-            data_file.write(json.dumps({"question": question, "answer": answer})+"\n")
 
+input_file = './data/0_output.json'
+f = open(input_file, "r")
+lines = f.readlines()
+f.close()
 
-    # for line in contents:
-    #     
-    #     print(question)
-    #     print(answer)
-    #     break
+input_file = 'question.jsonl'
+f = open(input_file, 'r')
+output_lines = f.readlines()
+f.close()
+
+output_file = "0_questions.jsonl"
+with open(output_file, 'w') as f_o:
+    index = 0
+    for line in lines:
+        data = json.loads(line)
+        output_data = json.loads(output_lines[index])
+        full_schema_context = json.loads(data["full_schema_context"])
+        paths = []
+        for path, values in full_schema_context.items():
+            paths.append(path)
+        paths_hash = create_path_hash(paths=paths)
+        f_o.write(json.dumps({"hash": paths_hash, "questions": output_data['questions']}) + '\n')
+        index += 1

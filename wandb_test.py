@@ -1,9 +1,9 @@
 import os
 from trl import SFTTrainer
-from transformers import AutoModelForCausalLM
+from inference import AutoModelForCausalLM
 from datasets import load_dataset
 import torch
-from transformers import (
+from inference import (
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
