@@ -7,15 +7,14 @@ from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained('NousResearch/Hermes-2-Theta-Llama-3-70B', trust_remote_code=True)
 
 model_path = "Meta-Llama-3-70B-Instruct.Q4_K_M.gguf"
-model_path = "models/Hermes-2-Pro-Llama-3-8B-Q8_0.gguf"
 import llama_cpp
 
 llm = llama_cpp.Llama(
     model_path=model_path,
     n_threads=32,  # CPU cores
     n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-    n_gpu_layers=24,  # Change this value based on your model and your GPU VRAM pool.
-    n_ctx=8000,  # Context window
+    n_gpu_layers=78,  # Change this value based on your model and your GPU VRAM pool.
+    n_ctx=7500,  # Context window
     verbose=True,
 )
 
@@ -63,7 +62,7 @@ def extract_resource_name(path):
             return component  # This is the resource name
     return None  # In case no non-parameter component is found
 
-def prompt_llama(messages):
+def prompt_llama(messages: list):
     #chat_template = build_llama3_prompt(prompt, system_content)
     
     # Generate a response from the model
@@ -184,6 +183,8 @@ print(f"Starting from {index}")
 try:
     paths = []
     for line in lines[index:]:
+        multi_stage_questions = []
+        single_stage_questions = []
         data = json.loads(line)
         full_schema_context = json.loads(data["full_schema_context"])
         path_context = json.loads(data["path_context"])
@@ -210,9 +211,12 @@ try:
         paths_hash = create_path_hash(paths=paths)
         multi_part_llm_response = multi_stage_questioning(first_context, second_context)
         single_part_llm_response = single_stage_questioning(first_context)
-        multi_stage_questions = format_questions_response(input_str=multi_part_llm_response, output_file=output_file, paths_hash=paths_hash)
-        single_stage_questions = format_questions_response(input_str=single_part_llm_response, output_file=output_file, paths_hash=paths_hash)
+        if multi_part_llm_response is not None:
+            multi_stage_questions = format_questions_response(input_str=multi_part_llm_response, output_file=output_file, paths_hash=paths_hash)
+        if single_part_llm_response is not None:
+            single_stage_questions = format_questions_response(input_str=single_part_llm_response, output_file=output_file, paths_hash=paths_hash)
 
         dump_data(output_file=output_file, paths_hash=paths_hash, multi_stage_questions=multi_stage_questions, single_stage_questions=single_stage_questions)
-except Exception:
+except Exception as exc:
+    print(exc)
     dump_data(output_file=output_file, paths_hash=paths_hash, multi_stage_questions=[], single_stage_questions=[])
