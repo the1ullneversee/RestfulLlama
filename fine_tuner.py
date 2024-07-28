@@ -1,185 +1,280 @@
+import rogue
+from typing import Any
+from unsloth import FastLanguageModel 
+from unsloth import is_bfloat16_supported
 import torch
-from inference import (
-    AutoTokenizer,
-    BitsAndBytesConfig,
-    TrainingArguments,
-)
-from peft import PeftModel, LoraConfig, prepare_model_for_kbit_training, get_peft_model
-from inference import AutoModelForCausalLM
+from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
+from transformers import TrainingArguments, LlamaTokenizer, TextStreamer, AutoTokenizer, AutoModelForCausalLM
+from datasets import load_dataset, Dataset, DatasetDict
 import os 
 import wandb
-from trl import SFTTrainer
+import peft.peft_model as PeftModel
+from peft import LoraConfig
 import json
+from sklearn.model_selection import train_test_split
+import pandas as pd
+import optuna
 
+max_seq_length = 4096 # Supports RoPE Scaling interally, so choose any!
 os.environ["WANDB_PROJECT"] = "alpaca_ft"
 os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
-os.environ["WANDB_API_KEY"] = "a89022a323f21514f65b632439d68dc16451d2d2"
-# start a new wandb run to track this script
+os.environ["WANDB_API_KEY"] = ""
+# # start a new wandb run to track this script
 
-wandb.init(
-    # set the wandb project where this run will be logged
-    project="my-awesome-project",
-    
-    # track hyperparameters and run metadata
-    config={
-    "learning_rate": 0.02,
-    "architecture": "LLM",
-    "dataset": "Custom",
-    "epochs": 3,
-    }
-)
-
-model_id='NousResearch/Llama-2-7b-hf'
-max_length = 512
-device_map = "auto"
-batch_size = 128
-micro_batch_size = 32
-gradient_accumulation_steps = batch_size // micro_batch_size
-
-compute_dtype = getattr(torch, "float16")
-
-quant_config = BitsAndBytesConfig(
+ 
+model_id = "unsloth/llama-3-8b-Instruct-bnb-4bit"
+base_model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name = model_id,
+    max_seq_length = max_seq_length,
+    dtype=None,
     load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=compute_dtype,
-    bnb_4bit_use_double_quant=False,
 )
 
-# load model from huggingface
-model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    quantization_config=quant_config,
-    use_cache=False,
-    device_map=device_map
-)
-model.config.use_cache = False
-model.config.pretraining_tp = 1
+# Use a different token as pad_token
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = '<|padding|>'
+    tokenizer.pad_token_id = tokenizer.add_special_tokens({'pad_token': '<|padding|>'})
+
+# Ensure eos_token and pad_token are different
+if tokenizer.eos_token_id == tokenizer.pad_token_id:
+    tokenizer.eos_token = '</s>'
+    tokenizer.eos_token_id = tokenizer.add_special_tokens({'eos_token': '</s>'})
+
+# Update the model's embedding layer if new tokens were added
+base_model.resize_token_embeddings(len(tokenizer))
 
 
-from datasets import load_dataset
-data_files = {"train": "train_dataset.jsonl", "test": "test_dataset.jsonl"}
+def map_dataset(data_line) -> None:
+    conversation = json.loads(data_line)
+    messages = []
+    for msg in conversation:
+        if isinstance(msg.get('content'), dict):
+            msg['content'] = "{" + ", ".join(f"'{k}': '{v}'" for k, v in msg.get('content').items()) + "}"
+        messages.append(msg)
+    return messages
 
-main_dataset = load_dataset('json', data_files=data_files)
-test, train = main_dataset['test'], main_dataset['train']
-# load tokenizer from huggingface
-tokenizer = AutoTokenizer.from_pretrained(model_id, token="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")
-tokenizer.pad_token = tokenizer.eos_token
-tokenizer.padding_side = "right"
+import pandas as pd
+from io import StringIO
 
-peft_params = LoraConfig(
-    lora_alpha=16,
-    lora_dropout=0.1,
-    r=64,
-    bias="none",
-    target_modules=["q_proj", "k_proj","v_proj","o_proj"], # the name of the layers to add LoRA
-    task_type="CAUSAL_LM",
-    modules_to_save=None, # layers to unfreeze and train from the original pre-trained model
-)
+with open("/workspace/training_data_set.jsonl", "r") as file:
+    data = file.read()
+    df = pd.read_json(StringIO(data), lines=True)
 
-def get_instructions(user_content, system_content):
-    instructions = [
-        { "role": "system","content": f"{system_content} "},
-    ]
+# Split the data into training and testing sets
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
-    instructions.append({"role": "user", "content": f"{user_content}"})
+"""
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+You are a helpful AI assistant for travel tips and recommendations<|eot_id|><|start_header_id|>user<|end_header_id|>
+What can you help me with?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+"""
 
-    return instructions
+# Apply the mapping function to both datasets
+train_df['messages'] = train_df.apply(lambda x: map_dataset(x.messages), axis=1)
+test_df['messages'] = test_df.apply(lambda x: map_dataset(x.messages), axis=1)
 
-def build_llama2_prompt(instructions):
-    stop_token = "</s>"
-    start_token = "<s>"
-    startPrompt = f"{start_token}[INST] "
-    endPrompt = " [/INST]"
-    conversation = []
-    for index, instruction in enumerate(instructions):
-        if instruction["role"] == "system" and index == 0:
-            conversation.append(f"<<SYS>>\n{instruction['content']}\n<</SYS>>\n\n")
-        elif instruction["role"] == "user":
-            conversation.append(instruction["content"].strip())
-        else:
-            conversation.append(f"{endPrompt} {instruction['content'].strip()} {stop_token}{startPrompt}")
+train_df['messages'] = train_df['messages'].apply(lambda x: tokenizer.apply_chat_template(x, tokenize=False, add_generation_prompt=True))
+test_df['messages'] = test_df['messages'].apply(lambda x: tokenizer.apply_chat_template(x, tokenize=False, add_generation_prompt=True))
 
-    return startPrompt + "".join(conversation) + endPrompt
+# Convert the DataFrames to Datasets
+train_dataset = Dataset.from_list(train_df['messages'].apply(lambda x: tokenizer(x, return_length=True)).to_list())
+test_dataset = Dataset.from_list(test_df['messages'].apply(lambda x: tokenizer(x, return_length=True)).to_list())
+instruction_template = '<|start_header_id|>user<|end_header_id|>'
+response_template = '<|start_header_id|>assistant<|end_header_id|>'
+collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template, response_template=response_template, tokenizer=tokenizer)
 
 
+def hyperparameter_tuning(base_model, train_dataset, tokenizer, collator, max_seq_length, n_trials=20):
+    def objective(trial):
+        # Define the hyperparameters to tune
+        learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-3)
+        per_device_train_batch_size = trial.suggest_categorical('per_device_train_batch_size', [1, 2, 4])
+        gradient_accumulation_steps = trial.suggest_int('gradient_accumulation_steps', 1, 8)
+        num_train_epochs = trial.suggest_int('num_train_epochs', 1, 5)
+        weight_decay = trial.suggest_loguniform('weight_decay', 1e-4, 1e-1)
+        warmup_ratio = trial.suggest_uniform('warmup_ratio', 0.0, 0.2)
+        r = trial.suggest_int('r', 8, 32)
+        lora_alpha = trial.suggest_int('lora_alpha', 8, 32)
+        
+        # Create PEFT model
+        model = FastLanguageModel.get_peft_model(
+            base_model,
+            r=r,
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                            "gate_proj", "up_proj", "down_proj",],
+            lora_alpha=lora_alpha,
+            lora_dropout=0,
+            bias="none",
+            use_gradient_checkpointing="unsloth",
+            random_state=3407,
+            max_seq_length=max_seq_length,
+            use_rslora=False,
+            loftq_config=None,
+        )
+        
+        # Create TrainingArguments with the suggested hyperparameters
+        args = TrainingArguments(
+            output_dir=f"outputs/trial_{trial.number}",
+            num_train_epochs=num_train_epochs,
+            per_device_train_batch_size=per_device_train_batch_size,
+            gradient_accumulation_steps=gradient_accumulation_steps,
+            learning_rate=learning_rate,
+            weight_decay=weight_decay,
+            warmup_ratio=warmup_ratio,
+            optim="adamw_8bit",
+            logging_steps=1,
+            fp16=not is_bfloat16_supported(),
+            bf16=is_bfloat16_supported(),
+            max_grad_norm=0.3,
+            max_steps=-1,
+            group_by_length=True,
+            lr_scheduler_type="constant",
+            length_column_name='length',
+            evaluation_strategy="steps",
+            eval_steps=100,  # Adjust as needed
+            save_strategy="steps",
+            save_steps=100,  # Adjust as needed
+        )
+        
+        # Initialize wandb run
+        wandb.init(
+            project="llm-rest-fine-tune",
+            config={
+                "learning_rate": learning_rate,
+                "epochs": num_train_epochs,
+                "architecture": "LLM",
+                "dataset": "Custom - Conversational Instructions",
+                "per_device_train_batch_size": per_device_train_batch_size,
+                "gradient_accumulation_steps": gradient_accumulation_steps,
+                "weight_decay": weight_decay,
+                "warmup_ratio": warmup_ratio,
+                "r": r,
+                "lora_alpha": lora_alpha,
+            },
+            reinit=True
+        )
+        
+        # Create SFTTrainer
+        trainer = SFTTrainer(
+            model=model,
+            train_dataset=train_dataset,
+            eval_dataset=train_dataset.select(range(min(100, len(train_dataset)))),  # Small eval dataset
+            dataset_text_field="messages",
+            max_seq_length=max_seq_length,
+            tokenizer=tokenizer,
+            data_collator=collator,
+            args=args
+        )
+        
+        # Train the model
+        train_result = trainer.train()
+        
+        # Log the results to wandb
+        wandb.log({"train_loss": train_result.training_loss})
+        
+        # Evaluate the model
+        eval_result = trainer.evaluate()
+        
+        wandb.finish()
+        
+        return eval_result['eval_loss']
+    
+    # Create an Optuna study object
+    # study = optuna.create_study(direction='minimize')
+    
+    # # Optimize the objective function
+    # study.optimize(objective, n_trials=n_trials)
+    # best_params = study.best_params
 
-def generate_prompt(dataset: list[dict]):
-    processed = []
-    for i in range(len(dataset["question"])):
-        question = dataset["question"][i]
-        answer = dataset["answer"][i]
-        question_answer = {}
-        question_answer['question'] = question
-        question_answer['answer'] = answer
-        question = ""
-        system_content_a = '''
-        You are a to be given questions about REST API Endpoints. Your answers are to be given in code or text.
-        Give no explanation, and only give the answer in the following format, no fluff text:
-        url: <url> headers: <headers> params: <params> body: <body> python code: <code> code needs to be in Python code using the requests library. Do not include imports, just code.
-        '''
-        system_content_b = f'''
-            The input will be a list of strings representing resource paths for a RESTFul API. Give you answers as operations a consumer of the API could perform.
-            Write the operations in natural language, and separate them with a comma, no fluff text.
-        '''
-        system_content_c = f'''
-            The input will be a list of strings representing resource paths for a RESTFul API.
-            Give your response based on which paths require an entity id, and if you can get that entity elsewhere, tell the user how.
-            Write the operations in natural language, and separate them with a comma, no fluff text.
-        '''
-        question = question_answer['question']
-        system_content = ""
-        if 'entity_id' in question:
-            system_content = system_content_c
-        else:
-            system_content = system_content_a
-        system_content_a = '''
-        You are a to be given questions about REST API Endpoints. Your answers are to be given in code or text.
-        Give no explanation, and only give the answer in the following format, no fluff text:
-        url: <url> headers: <headers> params: <params> body: <body> python code: <code> code needs to be in Python code using the requests library. Do not include imports, just code.
-        '''
-        instructions = get_instructions(question, system_content)
-        prompt = build_llama2_prompt(instructions)
-        whole_prompt = f"{prompt} " + f"Answer: {answer}" 
-        processed.append(whole_prompt)
-    return processed
+    # Get the best parameters and train the final model
+    best_params = {
+    'r': 8,
+    'lora_alpha': 32,
+    'num_train_epochs': 5,
+    'per_device_train_batch_size': 2,
+    'gradient_accumulation_steps': 3,
+    'learning_rate': 0.000208015,
+    'weight_decay': 0.01480421,
+    'warmup_ratio': 0.168125828
+}
+    best_model = FastLanguageModel.get_peft_model(
+        base_model,
+        r=best_params['r'],
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                        "gate_proj", "up_proj", "down_proj",],
+        lora_alpha=best_params['lora_alpha'],
+        lora_dropout=0,
+        bias="none",
+        use_gradient_checkpointing="unsloth",
+        random_state=3407,
+        max_seq_length=max_seq_length,
+        use_rslora=False,
+        loftq_config=None,
+    )
+    
+    best_args = TrainingArguments(
+        output_dir="outputs/best_model",
+        num_train_epochs=best_params['num_train_epochs'],
+        per_device_train_batch_size=best_params['per_device_train_batch_size'],
+        gradient_accumulation_steps=best_params['gradient_accumulation_steps'],
+        learning_rate=best_params['learning_rate'],
+        weight_decay=best_params['weight_decay'],
+        warmup_ratio=best_params['warmup_ratio'],
+        optim="adamw_8bit",
+        logging_steps=1,
+        fp16=not is_bfloat16_supported(),
+        bf16=is_bfloat16_supported(),
+        max_grad_norm=0.3,
+        max_steps=-1,
+        group_by_length=True,
+        lr_scheduler_type="constant",
+        length_column_name='length',
+        evaluation_strategy="steps",
+        eval_steps=100,
+        save_strategy="steps",
+        save_steps=100,
+    )
+    
+    # Initialize wandb for the final run
+    wandb.init(
+        project="llm-rest-fine-tune",
+        config={
+            "learning_rate": best_params['learning_rate'],
+            "epochs": best_params['num_train_epochs'],
+            "architecture": "LLM",
+            "dataset": "Custom - Conversational Instructions",
+            "per_device_train_batch_size": best_params['per_device_train_batch_size'],
+            "gradient_accumulation_steps": best_params['gradient_accumulation_steps'],
+            "weight_decay": best_params['weight_decay'],
+            "warmup_ratio": best_params['warmup_ratio'],
+            "r": best_params['r'],
+            "lora_alpha": best_params['lora_alpha'],
+        }
+    )
+    
+    # Create the final trainer
+    final_trainer = SFTTrainer(
+        model=best_model,
+        train_dataset=train_dataset,
+        dataset_text_field="messages",
+        max_seq_length=max_seq_length,
+        tokenizer=tokenizer,
+        data_collator=collator,
+        args=best_args
+    )
+    
+    # Train the final model
+    final_trainer.train()
+    
+    # Save the model
+    peft_model_id = "/workspace/peft_rest_llama_7b"
+    final_trainer.model.save_pretrained(peft_model_id)
+    tokenizer.save_pretrained(peft_model_id)
+    
+    wandb.finish()
+    
+    return final_trainer, best_params
 
-batch_size = 8
-gradient_accumulation_steps = 2
-num_train_epochs = 3
-
-training_params = TrainingArguments(
-    output_dir="./results",
-    num_train_epochs=3,
-    per_device_train_batch_size=batch_size,
-    per_device_eval_batch_size=batch_size//3,
-    gradient_accumulation_steps=gradient_accumulation_steps,
-    gradient_checkpointing=True,
-    optim="paged_adamw_32bit",
-    save_steps=25,
-    logging_steps=25,
-    learning_rate=2e-4,
-    weight_decay=0.001,
-    fp16=True,
-    bf16=False,
-    max_grad_norm=0.3,
-    max_steps=20,
-    warmup_ratio=0.03,
-    group_by_length=False,
-    lr_scheduler_type="constant",
-    report_to="wandb"
-)
-
-trainer = SFTTrainer(
-    model=model,
-    train_dataset=train,
-    peft_config=peft_params,
-    max_seq_length=None,
-    tokenizer=tokenizer,
-    args=training_params,
-    formatting_func=generate_prompt,
-    packing=False,
-)
-
-trainer.train()
-trainer.model.save_pretrained('./saved_model/')
-trainer.tokenizer.save_pretrained('./saved_model/')
+# Usage
+best_trainer, best_params = hyperparameter_tuning(base_model, train_dataset, tokenizer, collator, max_seq_length)
+print("Best hyperparameters:", best_params)
