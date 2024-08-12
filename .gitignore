@@ -5,3 +5,5 @@ notebooks/
 *.pyc
 *.pyo
 *.pyd
+*.gguf
+/models/
