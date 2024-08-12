@@ -14,6 +14,8 @@ import json
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import optuna
+import pandas as pd
+from io import StringIO
 
 max_seq_length = 4096 # Supports RoPE Scaling interally, so choose any!
 os.environ["WANDB_PROJECT"] = "alpaca_ft"
@@ -53,8 +55,6 @@ def map_dataset(data_line) -> None:
         messages.append(msg)
     return messages
 
-import pandas as pd
-from io import StringIO
 
 with open("/workspace/training_data_set.jsonl", "r") as file:
     data = file.read()
@@ -180,11 +180,11 @@ def hyperparameter_tuning(base_model, train_dataset, tokenizer, collator, max_se
         return eval_result['eval_loss']
     
     # Create an Optuna study object
-    # study = optuna.create_study(direction='minimize')
+    study = optuna.create_study(direction='minimize')
     
     # # Optimize the objective function
-    # study.optimize(objective, n_trials=n_trials)
-    # best_params = study.best_params
+    study.optimize(objective, n_trials=n_trials)
+    best_params = study.best_params
 
     # Get the best parameters and train the final model
     best_params = {
