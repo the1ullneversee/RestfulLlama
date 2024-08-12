@@ -343,6 +343,7 @@ def simulate_code_reasoning(answer: str):
             {"role": "system", "content": CODE_CONTEXT},
             {"role": "user", "content": answer}
         ]
+    answer = prompt_llama(messages=messages)
     questions = extract_code_placeholder_questions(answer)
     print(questions)
     if not questions:
