@@ -1,24 +1,23 @@
 import hashlib
 import json
 from collections import defaultdict
+import llama_cpp
 
-# from transformers import AutoTokenizer
+from transformers import AutoTokenizer
 
-# tokenizer = AutoTokenizer.from_pretrained('NousResearch/Hermes-2-Theta-Llama-3-70B', trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained('NousResearch/Hermes-2-Theta-Llama-3-70B', trust_remote_code=True)
+import re
+model_path = "Meta-Llama-3-70B-Instruct.Q4_K_M.gguf"
 
-# model_path = "Meta-Llama-3-70B-Instruct.Q4_K_M.gguf"
-# model_path = "models/Hermes-2-Pro-Llama-3-8B-Q8_0.gguf"
-# import llama_cpp
 
-llm = None
-# llm = llama_cpp.Llama(
-#     model_path=model_path,
-#     n_threads=32,  # CPU cores
-#     n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-#     n_gpu_layers=24,  # Change this value based on your model and your GPU VRAM pool.
-#     n_ctx=8000,  # Context window
-#     verbose=True,
-# )
+llm = llama_cpp.Llama(
+    model_path=model_path,
+    n_threads=16,  # CPU cores
+    n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
+    n_gpu_layers=-1,  # Change this value based on your model and your GPU VRAM pool.
+    n_ctx=8000,  # Context window
+    verbose=True,
+)
 
 inference_params = {
     "do_sample": True,
@@ -30,8 +29,6 @@ inference_params = {
     "stop": ["</s>"],
     "return_full_text": False,
 }
-
-import json
 
 
 def dump_empty(output_file, paths_hash):
@@ -176,8 +173,6 @@ def single_stage_questioning(first_context):
     print(llm_response)
     return llm_response
 
-import re
-
 def execute_context_call(full_schema_context, context_call):
     """Executes the context call and returns the schema for the requested endpoint."""
     # Extract the endpoint path from the context call
@@ -249,11 +244,23 @@ else:
 CODE_CONTEXT = """You are a language model reviewing a piece of Python code provided by the user. Your task is to:
 1. Examine the code for any placeholders or missing information that may be required for the code to function correctly.
 2. Generate a list of questions in a formatted way, so that these questions can be easily extracted and asked to the end-user to gather the necessary information needed to replace the placeholders.
-3. Expect a follow-up response from the user answering those questions.
+3. Generate a list of answers to the questions from Stage 2, as if they were answered by the user.
 4. Amend the Python code to include the values provided in the follow-up response.
 Each question should be formatted as follows:
 ```
 Question x: [Your question here]
+
+Your response should be as follows:
+Simulated Questions:
+Q1
+Q2
+...
+Simulated answers:
+A1
+A2
+...
+Amended code:
+....
 ```"""
 
 CODE_QUESTION_ANSWER_RESPONSE = """
@@ -284,6 +291,7 @@ def extract_simulated_answers(llm_response):
     Extracts the simulated answers from the LLM response.
     """
     # Regex pattern to match the simulated answers
+    # first strip out line breaks and encodings 
     pattern = r"Answer \d+: (.*)"
 
     # Search for the pattern in the input string
@@ -295,6 +303,7 @@ def extract_simulated_answers(llm_response):
             answers.append(match)
     else:
         print("No simulated answers found.")
+        return llm_response
     return answers
 
 def extract_amended_code(llm_response):
@@ -308,47 +317,75 @@ def extract_amended_code(llm_response):
     amended_code = llm_response[index+len("Amended code:"):]
     return amended_code
 
+def extract_simulated_data_parts(response):
+    start = "Simulated Questions:"
+    end = "Simulated answers:"
+    str_index = response.find(start)
+    end_index = response.find(end)
+
+    questions = response[str_index+len(start):end_index]
+    response = response[end_index:]
+
+    start = "Simulated answers:"
+    end = "Amended code:"
+    str_index = response.find(start)
+    end_index = response.find(end)
+
+    answers = response[str_index+len(start):end_index]
+    response = response[end_index:]
+
+    return questions, answers, response
+
+
 def simulate_code_reasoning(answer: str):
     return_messages = []
     messages = [
             {"role": "system", "content": CODE_CONTEXT},
             {"role": "user", "content": answer}
         ]
+    answer = prompt_llama(messages=messages)
     questions = extract_code_placeholder_questions(answer)
     print(questions)
+    if not questions:
+        return return_messages
     messages.append({"role": "user", "content": str(questions)})
     return_messages.append({"role": "user", "content": str(questions)})
+    code_question_answer_response = prompt_llama(messages=messages)
+    if code_question_answer_response == "":
+        return []
+    code_question_answer_response = code_question_answer_response["content"]
+    simulated_questions = ""
+    simulated_answers = ""
+    code_question_answer_response = code_question_answer_response.replace("\n", " ").replace("`", " ")
 
-    simulated_answers = extract_simulated_answers(CODE_QUESTION_ANSWER_RESPONSE)
+    simulated_questions, simulated_answers, response = extract_simulated_data_parts(code_question_answer_response)
+    simulated_answers = extract_simulated_answers(simulated_answers)
+
     messages.append({"role": "assistant", "content": str(simulated_answers)})
     return_messages.append({"role": "assistant", "content": str(simulated_answers)})
 
-    amended_code = extract_amended_code(CODE_QUESTION_ANSWER_RESPONSE)
+    amended_code = extract_amended_code(response)
     messages.append({"role": "assistant", "content": amended_code})
-
     return_messages.append({"role": "assistant", "content": amended_code})
+
     return return_messages
 
 def conversation_simulation(llm, multi_stage_questions, single_stage_questions, short_path_context: str, full_path_context: dict):
 
     system_context = f"""You are a helpful assistant that can generate Python code to interact with an application's API. You have access to the application's API endpoints and their corresponding schemas.
         When a user asks a question, your task is to ask for additional context about the API endpoints as needed, reason about the schema, and generate Python code to achieve the user's goal.
-        You can ask for context about an API endpoint by saying get_context('path'), where path is the endpoint path.
+        You can ask for context about an API endpoint by saying get_context(path='path', method='method'), where path is the endpoint path, and method is the HTTP method (e.g., 'GET', 'POST').
         The application's API endpoints are: {short_path_context}
         Please respond with a get_context request to clarify the API endpoint needed to answer the user's question."""
-    
-    # system_context = f"""You are a helpful assistant that can generate Python code to interact with an application's API. You have access to the application's API endpoints and their corresponding schemas.
-    # When a user asks a question, your task is to ask for additional context about the API endpoints as needed, reason about the schema, and generate Python code to achieve the user's goal.
-    # You can ask for context about an API endpoint by saying get_context('path'), where path is the endpoint path. You will receive a response with the schema and any relevant information about the endpoint.
-    # Your goal is to generate Python code that is correct, concise, and easy to understand. You may ask follow-up questions to clarify the user's request or request additional context about the API endpoints.
-    # The application's API endpoints are: {short_path_context}.
-    # Go ahead and respond to the user's question."""
     system_context = system_context.replace('\\n', '').replace('\\\'', '')
     simulated_questions = []
-    simulated_questions.append(generate_multi_stage_questions(multi_stage_questions, full_path_context, system_context, simulated_questions))
+    simulated_questions.extend(generate_multi_stage_conversations(multi_stage_questions, full_path_context, system_context, simulated_questions))
+    simulated_questions.extend(generate_single_stage_conversation(single_stage_questions, full_path_context, system_context, simulated_questions))
+
     return simulated_questions
 
-def generate_multi_stage_questions(multi_stage_questions, full_path_context, system_context, simulated_questions):
+def generate_multi_stage_conversations(multi_stage_questions, full_path_context, system_context):
+    multi_stage_questions = []
     for question in multi_stage_questions:
         user_question = question.split("Question: ")[1]
         full_messages = []
@@ -356,9 +393,11 @@ def generate_multi_stage_questions(multi_stage_questions, full_path_context, sys
             {"role": "system", "content": system_context},
             {"role": "user", "content": user_question}
         ]
-        answer = """To answer your question, I need more information about the API endpoint that retrieves the status of a provisioning job.
-                    Let me get some context about the /v1.0/provisioning/ondemandstatus/{jobid} endpoint.
-                    get_context('/v1.0/provisioning/ondemandstatus/{jobid}')"""
+        answer = prompt_llama(messages=messages)
+        if not answer:
+            print("Decide")
+            continue
+        answer = answer["content"]
         context_call = extract_context(answer)
         if not context_call:
             continue
@@ -367,12 +406,44 @@ def generate_multi_stage_questions(multi_stage_questions, full_path_context, sys
         if schema == "No match found.":
             continue
         messages.append({"role": "assistant", "content": schema})
-        #answer = prompt_llama(messages=messages)
-        answer = CODE_RESPONSE
+        answer = prompt_llama(messages=messages)
+        if answer == "":
+            continue
+        answer = answer["content"]
         full_messages.append(messages)
 
-        messages.extend(simulate_code_reasoning(CODE_RESPONSE))
-        simulated_questions.append(full_messages)
+        messages.extend(simulate_code_reasoning(answer))
+        multi_stage_questions.append(full_messages)
+    return multi_stage_questions
+
+def generate_single_stage_conversation(single_stage_questions, full_path_context, system_context):
+    single_stage_questions = []
+    for question in single_stage_questions:
+        user_question = question.split("Question: ")[1]
+        full_messages = []
+        messages = [
+            {"role": "system", "content": system_context},
+            {"role": "user", "content": user_question}
+        ]
+        answer = prompt_llama(messages=messages)
+        if not answer:
+            continue
+        answer = answer["content"]
+        context_call = extract_context(answer)
+        if not context_call:
+            continue
+        messages.append({"role": "context_layer", "content": context_call})
+        schema = execute_context_call(full_schema_context=full_path_context, context_call=context_call)
+        if schema == "No match found.":
+            continue
+        messages.append({"role": "assistant", "content": schema})
+        answer = prompt_llama(messages=messages)
+        if answer == "":
+            continue
+        answer = answer["content"]
+        full_messages.append(messages)
+        single_stage_questions.append(full_messages)
+    return single_stage_questions
 
 
 input_file = "./data/0_output.json"
@@ -406,7 +477,7 @@ try:
             if not values.get("parameters") and not values.get("request_body"):
                 continue
             full_line_item = f"{index}. [{{method: {values.get('method')}], path: {path}, summary: {values.get('summary')}, parameters: {values.get('parameters')}, request_body: {values.get('request_body') or []}, response_body: {values.get('response_body') or []}}}"
-            short_line_item = f"{index}. | {{\method\": \"{values.get('method')}\", \"path\": \"{path}\", \"response_body\": {values.get('response_body') or []}}}\n"
+            short_line_item = f"{index}. | {{'\method\': \"{values.get('method')}\", \"path\": \"{path}\", \"response_body\": {values.get('response_body') or []}}}\n"
             tiny_line_item = f"{index}. | {{\"path\": \"{path}\"}}\n"
             
             second_context += short_line_item
@@ -416,19 +487,17 @@ try:
             paths.append(path)
         
         paths_hash = create_path_hash(paths=paths)
-
-        if line_index > len(previous_questions):
-            multi_part_llm_response = multi_stage_questioning(first_context, second_context)
-            single_part_llm_response = single_stage_questioning(first_context)
-            multi_stage_questions = format_questions_response(input_str=multi_part_llm_response, output_file=output_file, paths_hash=paths_hash)
-            single_stage_questions = format_questions_response(input_str=single_part_llm_response, output_file=output_file, paths_hash=paths_hash)
-        else:
-            multi_stage_questions = previous_questions[line_index].get("questions")
-            single_stage_questions = previous_questions[line_index].get("single_stage_questions", [])
+        multi_part_llm_response = multi_stage_questioning(first_context, second_context)
+        single_part_llm_response = single_stage_questioning(first_context)
+        multi_stage_questions = format_questions_response(input_str=multi_part_llm_response, output_file=output_file, paths_hash=paths_hash)
+        single_stage_questions = format_questions_response(input_str=single_part_llm_response, output_file=output_file, paths_hash=paths_hash)
+        multi_stage_questions = previous_questions[line_index].get("questions")
+        single_stage_questions = previous_questions[line_index].get("single_stage_questions", [])
         conversation_simulation(llm=llm, multi_stage_questions=multi_stage_questions, single_stage_questions=single_stage_questions, short_path_context=third_context, full_path_context=full_schema_context)
 
         dump_data(output_file=output_file, paths_hash=paths_hash, multi_stage_questions=multi_stage_questions, single_stage_questions=single_stage_questions)
         line_index += 1
-except Exception:
+except Exception as exc:
+    print(exc)
     dump_data(output_file=output_file, paths_hash=paths_hash, multi_stage_questions=[], single_stage_questions=[])
     line_index += 1

@@ -41,8 +41,6 @@ class PathInfo:
     """
 
     path_name: str
-    # methods: dict[str, Content] = {}
-
     def __init__(self):
         self.methods = defaultdict(MethodInfo)
 
@@ -637,10 +635,6 @@ def parse_file(data: dict):
         paths = data.get("paths", {})
         global_definitions = process_global_definitions(data)
         for path, path_details in paths.items():
-            # take the parameters from the path
-            # take the request body
-            # take the response body
-            # take the summary and path name
             path_info = PathInfo()
             path_info.path_name = path
             for method, method_details in path_details.items():
