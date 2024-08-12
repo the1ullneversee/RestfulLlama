@@ -1,9 +1,15 @@
-import structlog
+import logging
+import re
 from collections import defaultdict
 from dataclasses import dataclass
-import re
 
+import structlog
+
+structlog.configure(
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+)
 logger = structlog.get_logger()
+
 
 def to_camel_case(s):
     if len(s) == 0:
@@ -41,6 +47,8 @@ class PathInfo:
     """
 
     path_name: str
+    # methods: dict[str, Content] = {}
+
     def __init__(self):
         self.methods = defaultdict(MethodInfo)
 
@@ -635,6 +643,10 @@ def parse_file(data: dict):
         paths = data.get("paths", {})
         global_definitions = process_global_definitions(data)
         for path, path_details in paths.items():
+            # take the parameters from the path
+            # take the request body
+            # take the response body
+            # take the summary and path name
             path_info = PathInfo()
             path_info.path_name = path
             for method, method_details in path_details.items():
@@ -718,20 +730,54 @@ def _generate_full_path_context(api_info: APIInfo):
            #schema_context += f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
     return schema_context
 
+def try_context_extract(context_call, full_schema_context):
+    """Tries to extract the context from the LLM response."""
+    start_index = context_call.find('get_context(')
+    end_index = context_call.find(')')
+    sub_string = context_call[start_index+len('get_context('):end_index]
+    if ',' in sub_string:
+        items = sub_string.split(',')
+        path = items[0]
+        method = items[1]
+        if 'method=' in method:
+            method = method.split('method=')[1]
+    else:
+        path = sub_string
+        method = ''
+    if 'path=' in path:
+        path = path.split('path=')[1]
+    path = path.strip().strip('\'').strip('\"')
+    method = method.strip().strip('\'')
+    path_schema = full_schema_context.get(path, {})
+    print(f"P: {path} M: {method}, PS: {path_schema}")
+    if method == '' and path_schema:
+        key = list(path_schema.keys())[0]
+        return path_schema.get(key, None)
+    return path_schema.get(method, None)
+    
+
 def execute_context_call(full_schema_context, context_call):
     """Executes the context call and returns the schema for the requested endpoint."""
+    method_values = ['get', 'post', 'put', 'delete', 'patch']
 
-    path_index= context_call.find("path=")
-    path = context_call[path_index+6:context_call.find(",", path_index)-1]
-    sub_string = context_call[path_index+6:]
-    method_index = sub_string.find("method=")
-    delimiter = sub_string.find(")")
-    if not delimiter:
-        delimiter = sub_string.find(",", method_index)
-    method = sub_string[method_index+8:delimiter-1]
+    context_start = context_call.find("get_context(")
+    sub_string = context_call[context_start+len('get_context('):]
+    sub_parts = sub_string.split(',')
+    if len(sub_parts) > 1:
+        path = sub_parts[0].strip().replace('path=', '').strip('\'').strip('\"')
+        method = ''
+        for method_val in method_values:
+            if method_val in sub_parts[1] or method_val.upper() in sub_parts[1]:
+                method = method_val
+                break
+    else:
+        path = sub_parts[0].strip().strip('\'')
+        method = ''
 
     # Get the schema for the requested endpoint
-    schema = full_schema_context.get(path, {}).get(method)
+    schema = full_schema_context.get(path, {}).get(method.lower())
+    if not schema and 'get_context' in context_call:
+        schema = try_context_extract(context_call, full_schema_context)
     if not schema:
         return None
     return schema
