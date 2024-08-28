@@ -175,7 +175,9 @@ def extract_definition(data, schema, global_definitions=None, caller_properties=
             content_ref = item.get("$ref", None)
             definition = navigate_json_ref(data, content_ref)
             if definition is None:
-                logger.debug("Error: Invalid JSON file, missing definition, in extract definition")
+                logger.debug(
+                    "Error: Invalid JSON file, missing definition, in extract definition"
+                )
     elif all_of is not None:
         definition = _handle_all_of(all_of, data)
     elif items is not None and items:
@@ -189,7 +191,9 @@ def extract_definition(data, schema, global_definitions=None, caller_properties=
         if content_ref is not None:
             definition = navigate_json_ref(data, content_ref)
             if definition is None:
-                logger.debug("Error: Invalid JSON file, missing definition, in extract definition")
+                logger.debug(
+                    "Error: Invalid JSON file, missing definition, in extract definition"
+                )
             def_properties = definition.get("properties", {})
             # data_properties = def_properties.get('data', None)
             # if data_properties is not None:
@@ -199,7 +203,9 @@ def extract_definition(data, schema, global_definitions=None, caller_properties=
         else:
             definition = schema.get("type", None)
             if definition is None:
-                logger.debug("Error: Invalid JSON file, missing definition, in extract definition")
+                logger.debug(
+                    "Error: Invalid JSON file, missing definition, in extract definition"
+                )
 
     return definition
 
@@ -215,7 +221,9 @@ def _extract_parameters(data: dict, parameters: list, global_definitions=None):
                 data, content_ref if content_ref is not None else parameter_ref
             )
             if definition is None:
-                logger.debug("Error: Invalid JSON file, missing definition when extracting parameters")
+                logger.debug(
+                    "Error: Invalid JSON file, missing definition when extracting parameters"
+                )
             extracted_parameters.append(definition)
         elif parameter.get("type", None):
             extracted_parameters.append(
@@ -246,7 +254,9 @@ def _extract_request_body(data: dict, request_body: dict, global_definitions=Non
     if content_ref is not None:
         definition = navigate_json_ref(data, content_ref)
         if definition is None:
-            logger.debug("Error: Invalid JSON file, missing definition when extracting request body")
+            logger.debug(
+                "Error: Invalid JSON file, missing definition when extracting request body"
+            )
         properties = _extract_properties(
             data=data,
             properties=definition.get("properties", {}),
@@ -650,7 +660,9 @@ def parse_file(data: dict):
             path_info = PathInfo()
             path_info.path_name = path
             for method, method_details in path_details.items():
-                logger.debug(f"Path: {path}, Method: {method} Method Details: {method_details}")
+                logger.debug(
+                    f"Path: {path}, Method: {method} Method Details: {method_details}"
+                )
                 params = _extract_parameters(
                     data,
                     method_details.get("parameters", []),
@@ -701,14 +713,10 @@ def _generate_path_to_response(api_info: APIInfo):
     """
     Generates a textual output for each path and what its response is.
     """
-    path_context = ""
-    # with open(file_name + ".txt", 'w') as f:
+    path_context = defaultdict(dict)
     for path in api_info.paths:
         for method in api_info.paths[path].methods:
-            response = {}
-            if api_info.paths[path].methods[method].response_body:
-                response = api_info.paths[path].methods[method].response_body
-            path_context += f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary>\n"
+            path_context[path][method] = f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary>\n"
     return path_context
 
 
@@ -725,62 +733,66 @@ def _generate_full_path_context(api_info: APIInfo):
             if api_info.paths[path].methods[method].response_body:
                 response = api_info.paths[path].methods[method].response_body
             reduce_response = reduce_json_info(response)
-            schema_context[path][method] = f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
-            #schema_context[path] = f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
-           #schema_context += f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
+            schema_context[path][
+                method
+            ] = f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
+            # schema_context[path] = f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
+        # schema_context += f"<Path> {path} </Path> <Method> {method} </Method> <Summary> {api_info.paths[path].methods[method].summary} </Summary> <Parameters> {parameters} </Parameters> <Request> {request_body} </Request> <Response> {reduce_response} </Response>\n"
     return schema_context
+
 
 def try_context_extract(context_call, full_schema_context):
     """Tries to extract the context from the LLM response."""
-    start_index = context_call.find('get_context(')
-    end_index = context_call.find(')')
-    sub_string = context_call[start_index+len('get_context('):end_index]
-    if ',' in sub_string:
-        items = sub_string.split(',')
+    start_index = context_call.find("get_context(")
+    end_index = context_call.find(")")
+    sub_string = context_call[start_index + len("get_context(") : end_index]
+    if "," in sub_string:
+        items = sub_string.split(",")
         path = items[0]
         method = items[1]
-        if 'method=' in method:
-            method = method.split('method=')[1]
+        if "method=" in method:
+            method = method.split("method=")[1]
     else:
         path = sub_string
-        method = ''
-    if 'path=' in path:
-        path = path.split('path=')[1]
-    path = path.strip().strip('\'').strip('\"')
-    method = method.strip().strip('\'')
+        method = ""
+    if "path=" in path:
+        path = path.split("path=")[1]
+    path = path.strip().strip("'").strip('"')
+    method = method.strip().strip("'")
     path_schema = full_schema_context.get(path, {})
     print(f"P: {path} M: {method}, PS: {path_schema}")
-    if method == '' and path_schema:
+    if method == "" and path_schema:
         key = list(path_schema.keys())[0]
         return path_schema.get(key, None)
     return path_schema.get(method, None)
-    
+
 
 def execute_context_call(full_schema_context, context_call):
     """Executes the context call and returns the schema for the requested endpoint."""
-    method_values = ['get', 'post', 'put', 'delete', 'patch']
+    method_values = ["get", "post", "put", "delete", "patch"]
 
     context_start = context_call.find("get_context(")
-    sub_string = context_call[context_start+len('get_context('):]
-    sub_parts = sub_string.split(',')
+    sub_string = context_call[context_start + len("get_context(") :]
+    sub_parts = sub_string.split(",")
     if len(sub_parts) > 1:
-        path = sub_parts[0].strip().replace('path=', '').strip('\'').strip('\"')
-        method = ''
+        path = sub_parts[0].strip().replace("path=", "").strip("'").strip('"')
+        method = ""
         for method_val in method_values:
             if method_val in sub_parts[1] or method_val.upper() in sub_parts[1]:
                 method = method_val
                 break
     else:
-        path = sub_parts[0].strip().strip('\'')
-        method = ''
+        path = sub_parts[0].strip().strip("'")
+        method = ""
 
     # Get the schema for the requested endpoint
     schema = full_schema_context.get(path, {}).get(method.lower())
-    if not schema and 'get_context' in context_call:
+    if not schema and "get_context" in context_call:
         schema = try_context_extract(context_call, full_schema_context)
     if not schema:
         return None
     return schema
+
 
 def extract_context(llm_response):
     """Extracts the context from the LLM response."""

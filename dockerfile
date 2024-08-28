@@ -32,6 +32,8 @@ RUN CMAKE_ARGS="-DLLAMA_CUDA=on" FORCE_CMAKE=1 poetry run pip install llama-cpp-
 RUN echo 'export LLAMA_CPP_LIB=~/.cache/pypoetry/virtualenvs/restful-llama-MATOk_fk-py3.10/lib/python3.10/site-packages/llama_cpp/lib/libllama.so' >> ~/.bashrc 
 ENV PATH=/code/.venv/bin:$PATH
 
+RUN poetry run pip install "unsloth[cu121-torch230] @ git+https://github.com/unslothai/unsloth.git"
+
 RUN apt-get update && apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
 
