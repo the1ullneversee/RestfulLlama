@@ -80,19 +80,20 @@ further_text_blocks = [
 ]
 
 
-def prompt_llm(llm: Llama, content: str, history: list[dict]) -> str:
+def prompt_llm(llm: Llama, content: str, history: list[dict]) -> dict:
     history.append({"role": "system", "content": content})
     answer = llm.create_chat_completion(messages=history)
     return answer.get("choices")[0].get("message")
 
 
 def _api_context_summary(llm: Llama, api_context: APIInfo) -> str:
-    system_message = "Here is some information about the API you are interacting with, please provide a summary of the API to confirm with the user and that you understand the API."
+    system_message = "Here is some information about the API you are interacting with, please provide a summary of the API to confirm with the user that you understand the API"
     context = _generate_path_to_response(api_context)
     system_message += f"\n\n{context}"
     history = [{"role": "system", "content": system_message}]
-    answer = prompt_llm(llm, system_message, history)
-    return answer
+    answer: dict = prompt_llm(llm, system_message, history)
+    history.append(answer)
+    return answer.get("content")
 
 
 def _conversation_loop(llm: Llama, api_docs_json: dict) -> None:
@@ -109,7 +110,7 @@ async def main() -> None:
     model_task = asyncio.create_task(load_language_model(repo_name, model_name))
 
     welcome_text = (
-        "Welcome to RestfulLlama! 🦙"
+        "Welcome to RestfulLlama!  "
         + "\n"
         + "RestfulLlama is a fine-tuned Large Language Model specifically designed to interacting with RESTFul based APIs!"
     )
@@ -122,20 +123,3 @@ async def main() -> None:
         else:
             stream_output("Loading the model...")
         await asyncio.sleep(2)
-    llm = await model_task
-    stream_output("Model loaded successfully!")
-    example_documentation_url = "https://petstore.swagger.io/v2/swagger.json"
-    url = example_documentation_url
-    # url = input()
-    stream_output(f"Great! You have entered the URL: {url}")
-    stream_output("Processing the API Docs...")
-    api_docs = download_docs(url)
-    with open(api_docs, "r", encoding="utf-8") as f:
-        api_docs_json = json.load(f)
-    stream_output("API Docs loaded successfully!")
-    stream_output("You can now start interacting with the API!")
-    _conversation_loop(llm, api_docs_json)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
