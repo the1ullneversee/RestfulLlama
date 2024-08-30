@@ -6,20 +6,13 @@ from io import StringIO
 import optuna
 import pandas as pd
 import torch
-import wandb
-from datasets import Dataset, DatasetDict, load_dataset
-from huggingface_hub import HfApi
-from peft import PeftConfig, PeftModel
+from datasets import Dataset
 from sklearn.model_selection import train_test_split
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    LlamaTokenizer,
-    TextStreamer,
-    TrainingArguments,
-)
+from transformers import TrainingArguments
 from trl import DataCollatorForCompletionOnlyLM, SFTTrainer
 from unsloth import FastLanguageModel, is_bfloat16_supported
+
+import wandb
 
 
 def hyperparameter_tuning(
@@ -30,6 +23,7 @@ def hyperparameter_tuning(
     collator,
     max_seq_length,
     n_trials=20,
+    run_hyperparameter_optimization=False,
 ):
     def objective(trial):
         # Define the hyperparameters to tune (removed LoRA-specific ones)
@@ -124,15 +118,22 @@ def hyperparameter_tuning(
 
         return eval_result["eval_loss"]
 
-    # Create an Optuna study object
-    # study = optuna.create_study(direction='minimize', study_name=project_name, storage="sqlite:///db.sqlite3")
-    study = optuna.load_study(
-        study_name="1722762862_llm-rest-fine-tune_unsloth_llama-3-8b-Instruct",
-        storage="sqlite:///db.sqlite3",
-    )
+    if run_hyperparameter_optimization:
+        # Create an Optuna study object
+        study = optuna.create_study(
+            direction="minimize",
+            study_name=project_name,
+            storage="sqlite:///./fine-tuning/db.sqlite3",
+        )
+        # # Optimize the objective function
+        study.optimize(objective, n_trials=n_trials)
+    else:
+        # Load an existing study
+        study = optuna.load_study(
+            study_name="1722762862_llm-rest-fine-tune_unsloth_llama-3-8b-Instruct",
+            storage="sqlite:///./fine-tuning/db.sqlite3",
+        )
 
-    # # Optimize the objective function
-    # study.optimize(objective, n_trials=n_trials)
     best_params = study.best_params
 
     # Get the best parameters and train the final model
@@ -181,22 +182,22 @@ def hyperparameter_tuning(
         save_steps=100,
     )
 
-    # Initialize wandb for the final run
-    wandb.init(
-        project=project_name,
-        config={
-            "learning_rate": best_params["learning_rate"],
-            "epochs": best_params["num_train_epochs"],
-            "architecture": "LLM",
-            "dataset": "Custom - Conversational Instructions",
-            "per_device_train_batch_size": best_params["per_device_train_batch_size"],
-            "gradient_accumulation_steps": best_params["gradient_accumulation_steps"],
-            "weight_decay": best_params["weight_decay"],
-            "warmup_ratio": best_params["warmup_ratio"],
-            "r": best_params["r"],
-            "lora_alpha": best_params["lora_alpha"],
-        },
-    )
+    # # Initialize wandb for the final run
+    # wandb.init(
+    #     project=project_name,
+    #     config={
+    #         "learning_rate": best_params["learning_rate"],
+    #         "epochs": best_params["num_train_epochs"],
+    #         "architecture": "LLM",
+    #         "dataset": "Custom - Conversational Instructions",
+    #         "per_device_train_batch_size": best_params["per_device_train_batch_size"],
+    #         "gradient_accumulation_steps": best_params["gradient_accumulation_steps"],
+    #         "weight_decay": best_params["weight_decay"],
+    #         "warmup_ratio": best_params["warmup_ratio"],
+    #         "r": best_params["r"],
+    #         "lora_alpha": best_params["lora_alpha"],
+    #     },
+    # )
 
     # Create the final trainer
     final_trainer = SFTTrainer(
@@ -218,13 +219,13 @@ def hyperparameter_tuning(
     final_trainer.model.save_pretrained(peft_model_id)
     tokenizer.save_pretrained(peft_model_id)
 
-    wandb.finish()
+    # wandb.finish()
 
     return final_trainer, best_params
 
 
 model_id = "unsloth/llama-3-8b-Instruct"
-max_seq_length = 4096  # Supports RoPE Scaling interally, so choose any!
+max_seq_length = 8096  # Supports RoPE Scaling interally, so choose any!
 os.environ["WANDB_PROJECT"] = "alpaca_ft"
 os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
 # # # start a new wandb run to track this script
@@ -263,7 +264,7 @@ def map_dataset(data_line) -> None:
     return messages
 
 
-with open("/workspace/training_data_set.jsonl", "r") as file:
+with open("./fine-tuning/training_data_set.jsonl", "r") as file:
     data = file.read()
     df = pd.read_json(StringIO(data), lines=True)
 
@@ -310,7 +311,15 @@ project_name = (
     f"{int(datetime.now().timestamp())}_llm-rest-fine-tune_{model_id}".replace("/", "_")
 )
 
-_, best_params = hyperparameter_tuning(
-    base_model, train_dataset, test_dataset, tokenizer, collator, max_seq_length
+final_trainer, best_params = hyperparameter_tuning(
+    base_model,
+    train_dataset,
+    test_dataset,
+    tokenizer,
+    collator,
+    max_seq_length,
+    n_trials=20,
+    run_hyperparameter_optimization=False,
 )
+
 print("Best hyperparameters:", best_params)
