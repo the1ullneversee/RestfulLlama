@@ -1,6 +1,9 @@
 import json
+import math
 import os
+import subprocess
 import tarfile
+import zipfile
 
 import llama_cpp
 import requests
@@ -187,21 +190,38 @@ def _conversational_generation(
         )
 
 
-def download_data_set(url, save_path, file_name):
-    logger.info(f"Downloading {url} to {save_path + file_name}")
-    response = requests.get(url, stream=True, timeout=10)
-    with open(save_path + file_name, "wb") as f:
-        for chunk in response.iter_content(chunk_size=128):
-            f.write(chunk)
-
-
-def untar_file(file_path: str, destination: str):
+def pull_and_process_files(git_repo_path, input_folder):
+    # Change to the git repository directory
+    zip_prefix = "grouped_files"
+    # Pull files using Git LFS
     try:
-        with tarfile.open(file_path) as tar:
-            tar.extractall(path=destination)
-        print(f"Extracted {file_path} to {destination}")
-    except Exception as e:
-        print(f"Error extracting {file_path}: {e}")
+        subprocess.run(["git", "lfs", "pull"], check=True)
+        print("Git LFS pull completed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during Git LFS pull: {e}")
+        return
+
+    os.makedirs(input_folder, exist_ok=True)
+    # Counter for extracted files
+    total_files = 0
+
+    # Loop through the expected zip files
+    for i in range(1, 5):  # Assuming 4 groups as before
+        zip_filename = f"{git_repo_path}{zip_prefix}_group_{i}.zip"
+
+        # Check if the zip file exists
+        if not os.path.exists(zip_filename):
+            print(f"Warning: {zip_filename} not found. Skipping.")
+            continue
+
+        # Extract files from the zip
+        with zipfile.ZipFile(zip_filename, "r") as zipf:
+            zipf.extractall(input_folder)
+            total_files += len(zipf.namelist())
+
+        print(f"Extracted files from {zip_filename}")
+
+    print(f"Extraction complete. Total files extracted: {total_files}")
 
 
 def preflight_check(
@@ -216,9 +236,7 @@ def preflight_check(
         os.mkdir(data_folder)
 
     if not os.path.exists(input_folder):
-        file_name = "openapi-data.tar"
-        download_data_set(raw_data_set_url, parent_path, file_name)
-        untar_file(file_name, parent_path)
+        pull_and_process_files(git_repo_path=parent_path, input_folder=input_folder)
 
     if not os.path.exists(broken_files_folder):
         os.mkdir(broken_files_folder)
@@ -338,3 +356,9 @@ async def generation_main():
             llm=llm,
         )
         print(f"Processed {file} \n")
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(generation_main())
