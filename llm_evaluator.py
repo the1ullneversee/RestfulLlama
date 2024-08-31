@@ -6,7 +6,7 @@ import llama_cpp
 import structlog
 from openai import OpenAI
 
-from shared.schema_processor import (
+from data_generation.schema_processor import (
     _generate_full_path_context,
     _generate_path_to_response,
     execute_context_call,

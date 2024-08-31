@@ -11,6 +11,10 @@ optuna = "^3.6.1"
 openai = "^1.40.3"
 structlog = "^24.4.0"
 huggingface-hub = "^0.24.5"
+colorama = "^0.4.6"
+wandb = "^0.17.8"
+scikit-learn = "^1.5.1"
+optuna-dashboard = "^0.16.1"
 
 
 [build-system]
