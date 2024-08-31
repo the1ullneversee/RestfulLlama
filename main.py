@@ -7,6 +7,8 @@ import torch
 from colorama import Fore
 
 from data_generation.synthetic_dataset_generation import generation_main
+from fine_tuning.fine_tuner import fine_tune_model
+from llm_evaluator import eval_runner
 from model_converser import inference
 
 
@@ -115,10 +117,10 @@ async def main() -> None:
             await generation_main()
         case "2":
             stream_output("Fine-tuning Model...", Fore.CYAN)
-            # await fine_tune_model()
+            await fine_tune_model()
         case "3":
             stream_output("Evaluating Model...", Fore.CYAN)
-            # await evaluate_model()
+            await eval_runner()
         case "4":
             stream_output("Starting CLI Inference...", Fore.CYAN)
             await inference()
@@ -130,5 +132,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    # asyncio.run(load_sloth_model())
     asyncio.run(main())

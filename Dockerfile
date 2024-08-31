@@ -32,6 +32,7 @@ RUN poetry install
 RUN poetry run pip install torch==2.4.0
 RUN poetry run pip install "unsloth[cu121-torch240] @ git+https://github.com/unslothai/unsloth.git"
 RUN CMAKE_ARGS="-DLLAMA_CUDA=on" FORCE_CMAKE=1 poetry run pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
+RUN git clone https://github.com/ggerganov/llama.cpp.git
 
 ENV PATH=/code/.venv/bin:$PATH
 RUN git config --global --add safe.directory /code

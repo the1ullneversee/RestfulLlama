@@ -3,19 +3,18 @@ import json
 import logging
 import os
 import random
-import re
 import sys
 import time
 import uuid
-from typing import Any
 
 import colorama
-import llama_cpp
 import requests
-import structlog
 from colorama import Fore
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
+
+logging.basicConfig(level=logging.CRITICAL)
+logger = logging.getLogger(__name__)
 
 from data_generation.schema_processor import (
     APIInfo,
@@ -57,42 +56,6 @@ def download_gguf_model(local_dir="./models"):
     except Exception as e:
         print(f"An error occurred while downloading the model: {e}")
         return None
-
-
-def load_code_model():
-    model_url = "TheBloke/deepseek-coder-6.7B-instruct-GGUF"
-    return Llama.from_pretrained(
-        repo_id=model_url,
-        filename="deepseek-coder-6.7b-instruct.Q8_0.gguf",
-        local=False,
-        n_threads=8,  # CPU cores
-        n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-        n_gpu_layers=-1,  # Change this value based on your model and your GPU VRAM pool.
-        n_ctx=llm_ctx_window,  # Context window
-    )
-
-
-async def load_sloth_model():
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="the1ullneversee/RestfulLlama-8B-Instruct",
-        # model_name="unsloth/Phi-3-mini-4k-instruct",
-        max_seq_length=llm_ctx_window,
-        dtype=None,
-        load_in_4bit=False,
-    )
-    FastLanguageModel.for_inference(model)  # Enable native 2x faster inference
-    text_streamer = TextStreamer(tokenizer)
-    prompt_llm(model, tokenizer, "Hello, how are you doing?", [])
-    # inputs = tokenizer(
-    #     "Hello, how are you doing?", return_tensors="pt", padding=True
-    # ).to("cuda")
-    # outputs = model.generate(**inputs, max_new_tokens=64)
-    # input_length = inputs["input_ids"].shape[1]
-    # predictions = tokenizer.batch_decode(
-    #     outputs[:, input_length:], skip_special_tokens=True
-    # )
-    # stream_output(predictions[0], Fore.CYAN)
-    return model, tokenizer
 
 
 async def load_language_model() -> None:
@@ -152,33 +115,6 @@ further_text_blocks = [
     "RestfulLlama was trained on a dataset of synthetic conversations between users and RESTFul APIs.",
     "Llama 7 70B Instruct was used as the base model for synthetic dataset generation.",
 ]
-
-
-# def prompt_llm(
-#     model, tokenizer: AutoTokenizer, content: str, history: list[dict]
-# ) -> str:
-#     # Prepare the input text
-#     history.append({"role": "system", "content": content})
-#     input_text = format_chat_history(history)
-
-#     # Tokenize the input
-#     inputs = tokenizer(input_text, return_tensors="pt", padding=True).to(model.device)
-#     outputs = model.generate(**inputs, max_new_tokens=64)
-#     input_length = inputs["input_ids"].shape[1]
-#     predictions = tokenizer.batch_decode(
-#         outputs[:, input_length:], skip_special_tokens=True
-#     )
-#     stream_output(predictions[0], Fore.CYAN)
-#     return predictions[0]
-
-
-# def format_chat_history(history: list[dict]) -> str:
-#     formatted_history = ""
-#     for message in history:
-#         role = message["role"]
-#         content = message["content"]
-#         formatted_history += f"{role.capitalize()}: {content}\n"
-#     return formatted_history.strip()
 
 
 def prompt_llm(llm: Llama, content: str, history: list[dict]) -> dict:
