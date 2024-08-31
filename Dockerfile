@@ -32,3 +32,20 @@ RUN poetry install
 RUN poetry run pip install torch==2.4.0
 RUN poetry run pip install "unsloth[cu121-torch240] @ git+https://github.com/unslothai/unsloth.git"
 RUN CMAKE_ARGS="-DLLAMA_CUDA=on" FORCE_CMAKE=1 poetry run pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
+
+ENV PATH=/code/.venv/bin:$PATH
+
+RUN apt-get update && apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
+
+RUN echo 'root:admin_tk_2024' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN apt install nano
+
+# SSH login fix. Otherwise, the user is kicked off after login.
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

@@ -2,9 +2,6 @@ import json
 import os
 import tarfile
 import threading as th
-import time
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import Value
 from queue import Queue
 
 import requests
@@ -101,7 +98,9 @@ def process_file(file: str, input_folder: str, output_file: str):
             "path_context": path_context,
             "full_schema_context": full_schema_context,
         }
-        _dump_to_file(output_file=output_file, values=values)
+        _conversational_generation()
+
+        # _dump_to_file(output_file=output_file, values=values)
         f.close()
         _move_file(
             folder=input_folder,

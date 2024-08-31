@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from datetime import datetime
 from io import StringIO
 
@@ -13,6 +14,9 @@ from trl import DataCollatorForCompletionOnlyLM, SFTTrainer
 from unsloth import FastLanguageModel, is_bfloat16_supported
 
 import wandb
+
+if __name__ == "__main__":
+    get_gpu_info()
 
 
 def hyperparameter_tuning(
