@@ -34,6 +34,8 @@ RUN poetry run pip install "unsloth[cu121-torch240] @ git+https://github.com/uns
 RUN CMAKE_ARGS="-DLLAMA_CUDA=on" FORCE_CMAKE=1 poetry run pip install llama-cpp-python --no-cache-dir --force-reinstall --upgrade
 
 ENV PATH=/code/.venv/bin:$PATH
+RUN git config --global --add safe.directory /code
+RUN apt-get install git-lfs
 
 RUN apt-get update && apt-get install -y openssh-server
 RUN mkdir /var/run/sshd

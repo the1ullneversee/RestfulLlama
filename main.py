@@ -6,6 +6,7 @@ import time
 import torch
 from colorama import Fore
 
+from data_generation.synthetic_dataset_generation import generation_main
 from model_converser import inference
 
 
@@ -111,7 +112,7 @@ async def main() -> None:
     match selected_option:
         case "1":
             stream_output("Generating Synthetic Dataset...", Fore.CYAN)
-            # await generate_synthetic_dataset()
+            await generation_main()
         case "2":
             stream_output("Fine-tuning Model...", Fore.CYAN)
             # await fine_tune_model()
