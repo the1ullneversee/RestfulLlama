@@ -20,6 +20,7 @@ from helper import (
     single_stage_questioning,
 )
 from schema_processor import (
+    APIInfo,
     _generate_full_path_context,
     _generate_path_to_response,
     parse_file,
@@ -28,103 +29,9 @@ from transformers import AutoTokenizer
 
 logger = structlog.get_logger()
 
-inference_params = {
-    "do_sample": True,
-    "top_p": 0.6,
-    "temperature": 0.1,
-    "top_k": 50,
-    "max_new_tokens": 512,
-    "repetition_penalty": 1.03,
-    "stop": ["</s>"],
-    "return_full_text": False,
-}
-
-
-# input_file = "./data/0_output.json"
-# f = open(input_file, "r")
-# lines = f.readlines()
-# f.close()
-
-# output_file = "0_questions.jsonl"
-# previous_questions, start_index = get_questions(output_file=output_file)
-
-# line_index = start_index
-# try:
-#     paths = []
-#     multi_stage_questions = []
-#     single_stage_questions = []
-#     for line in lines[start_index:]:
-#         data = json.loads(line)
-#         full_schema_context = json.loads(data["full_schema_context"])
-#         path_context = json.loads(data["path_context"])
-#         path_parameters = {}
-#         response_parameters = defaultdict(list)
-#         request_params = defaultdict(list)
-#         index = 0
-#         first_context = ""
-#         second_context = ""
-#         third_context = ""
-#         for path, values in full_schema_context.items():
-#             method = values.get("method")
-
-#             resource = extract_resource_name(path)
-#             if not values.get("parameters") and not values.get("request_body"):
-#                 continue
-#             full_line_item = f"{index}. [{{method: {values.get('method')}], path: {path}, summary: {values.get('summary')}, parameters: {values.get('parameters')}, request_body: {values.get('request_body') or []}, response_body: {values.get('response_body') or []}}}"
-#             short_line_item = f"{index}. | {{'\method': \"{values.get('method')}\", \"path\": \"{path}\", \"response_body\": {values.get('response_body') or []}}}\n"
-#             tiny_line_item = f'{index}. | {{"path": "{path}"}}\n'
-
-#             second_context += short_line_item
-#             first_context += full_line_item
-#             third_context += tiny_line_item
-#             index += 1
-#             paths.append(path)
-
-#         paths_hash = create_path_hash(paths=paths)
-#         multi_part_llm_response = multi_stage_questioning(first_context, second_context)
-#         single_part_llm_response = single_stage_questioning(first_context)
-#         multi_stage_questions = format_questions_response(
-#             input_str=multi_part_llm_response,
-#             output_file=output_file,
-#             paths_hash=paths_hash,
-#         )
-#         single_stage_questions = format_questions_response(
-#             input_str=single_part_llm_response,
-#             output_file=output_file,
-#             paths_hash=paths_hash,
-#         )
-#         multi_stage_questions = previous_questions[line_index].get("questions")
-#         single_stage_questions = previous_questions[line_index].get(
-#             "single_stage_questions", []
-#         )
-#         conversation_simulation(
-#             llm=llm,
-#             multi_stage_questions=multi_stage_questions,
-#             single_stage_questions=single_stage_questions,
-#             short_path_context=third_context,
-#             full_path_context=full_schema_context,
-#         )
-
-#         dump_data(
-#             output_file=output_file,
-#             paths_hash=paths_hash,
-#             multi_stage_questions=multi_stage_questions,
-#             single_stage_questions=single_stage_questions,
-#         )
-#         line_index += 1
-# except Exception as exc:
-#     print(exc)
-#     dump_data(
-#         output_file=output_file,
-#         paths_hash=paths_hash,
-#         multi_stage_questions=[],
-#         single_stage_questions=[],
-#     )
-#     line_index += 1
-
 
 def _conversational_generation(
-    full_schema_context: dict, llm: llama_cpp.Llama, output_file: str
+    api_information: APIInfo, llm: llama_cpp.Llama, output_file: str, full_schema_context: dict
 ):
     try:
         paths = []
@@ -134,24 +41,25 @@ def _conversational_generation(
         second_context = ""
         third_context = ""
         index = 0
-        for path, values in full_schema_context.items():
-            method = values.get("method")
-            resource = extract_resource_name(path)
-            if not values.get("parameters") and not values.get("request_body"):
-                continue
-            full_line_item = f"{index}. [{{method: {values.get('method')}], path: {path}, summary: {values.get('summary')}, parameters: {values.get('parameters')}, request_body: {values.get('request_body') or []}, response_body: {values.get('response_body') or []}}}"
-            short_line_item = f"{index}. | {{'\method': \"{values.get('method')}\", \"path\": \"{path}\", \"response_body\": {values.get('response_body') or []}}}\n"
-            tiny_line_item = f'{index}. | {{"path": "{path}"}}\n'
+        for path in api_information.paths:
+            for method, values in api_information.paths[path].methods.items():
+                pass
+                resource = extract_resource_name(path)
+                if not values.parameters and not values.request_body:
+                    continue
+                full_line_item = f"{index}. [{{method: {method}], path: {path}, summary: {values.summary}, parameters: {values.parameters}, request_body: {values.request_body or []}, response_body: {values.response_body or []}}} \n"
+                short_line_item = f"{index}. | {{'\method': \"{method}\", \"path\": \"{path}\", \"response_body\": {values.response_body or []}}} \n"
+                tiny_line_item = f'{index}. | {{"path": "{path}"}} \n'
 
-            second_context += short_line_item
-            first_context += full_line_item
-            third_context += tiny_line_item
-            paths.append(path)
-            index += 1
+                second_context += short_line_item
+                first_context += full_line_item
+                third_context += tiny_line_item
+                paths.append(path)
+                index += 1
 
         paths_hash = create_path_hash(paths=paths)
-        multi_part_llm_response = multi_stage_questioning(first_context, second_context)
-        single_part_llm_response = single_stage_questioning(first_context)
+        multi_part_llm_response = multi_stage_questioning(first_context, second_context, llm=llm)
+        single_part_llm_response = single_stage_questioning(first_context, llm=llm)
         multi_stage_questions = format_questions_response(
             input_str=multi_part_llm_response,
             output_file=output_file,
@@ -162,11 +70,7 @@ def _conversational_generation(
             output_file=output_file,
             paths_hash=paths_hash,
         )
-        # multi_stage_questions = previous_questions[line_index].get("questions")
-        # single_stage_questions = previous_questions[line_index].get(
-        #     "single_stage_questions", []
-        # )
-        conversation_simulation(
+        simulated_conversations = conversation_simulation(
             llm=llm,
             multi_stage_questions=multi_stage_questions,
             single_stage_questions=single_stage_questions,
@@ -179,6 +83,7 @@ def _conversational_generation(
             paths_hash=paths_hash,
             multi_stage_questions=multi_stage_questions,
             single_stage_questions=single_stage_questions,
+            simulated_conversations=simulated_conversations,
         )
     except Exception as exc:
         print(exc)
@@ -187,6 +92,7 @@ def _conversational_generation(
             paths_hash=paths_hash,
             multi_stage_questions=[],
             single_stage_questions=[],
+            simulated_conversations=[]
         )
 
 
@@ -206,6 +112,7 @@ def pull_and_process_files(git_repo_path, input_folder):
     total_files = 0
 
     # Loop through the expected zip files
+    print("Processing compressed folders.")
     for i in range(1, 5):  # Assuming 4 groups as before
         zip_filename = f"{git_repo_path}{zip_prefix}_group_{i}.zip"
 
@@ -236,6 +143,7 @@ def preflight_check(
         os.mkdir(data_folder)
 
     if not os.path.exists(input_folder):
+        print("Detected raw dataset does not exist. Using GIT LFS to pull. Please wait.")
         pull_and_process_files(git_repo_path=parent_path, input_folder=input_folder)
 
     if not os.path.exists(broken_files_folder):
@@ -280,15 +188,9 @@ def process_file(
             )
             return processed_file
 
-        values = {
-            "path_context": path_context,
-            "full_schema_context": full_schema_context,
-        }
         _conversational_generation(
-            full_schema_context, llm=llm, output_file=output_file
+            api_information=api_information, llm=llm, output_file=output_file, full_schema_context=full_schema_context
         )
-
-        # _dump_to_file(output_file=output_file, values=values)
         f.close()
         _move_file(
             folder=input_folder,
@@ -310,18 +212,17 @@ def process_file(
 
 
 async def generation_main():
+
+    print("Starting synthetic data generation.")
     parent_folder = "./data_generation/"
     data_folder = parent_folder + "data/"
     input_folder = parent_folder + "input/"
     broken_files_folder = parent_folder + "broken_files/"
     data_set_parsed_folder = parent_folder + "processed_files/"
-    output_file = data_folder + "/data_set.json"
+    output_file = data_folder + "/custom_data_set.json"
     raw_data_set_url = (
         "https://wordlists-cdn.assetnote.io/rawdata/kiterunner/swagger-files.tar"
     )
-    # tokenizer = AutoTokenizer.from_pretrained(
-    #     "NousResearch/Hermes-2-Theta-Llama-3-70B", trust_remote_code=True
-    # )
 
     file_name = "Meta-Llama-3-70B-Instruct-Q4_K_M.gguf"
     local_dir = "../models/"
@@ -336,6 +237,7 @@ async def generation_main():
         data_set_parsed_folder=data_set_parsed_folder,
         raw_data_set_url=raw_data_set_url,
     )
+    print("Loading LLama 3 70B, this is a 40GB file, feel free to go make a cuppa tea.")
     llm = await load_language_model(
         local_dir=local_dir,
         repo_name=repo_name,
@@ -360,5 +262,4 @@ async def generation_main():
 
 if __name__ == "__main__":
     import asyncio
-
     asyncio.run(generation_main())

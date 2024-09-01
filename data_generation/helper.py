@@ -7,6 +7,8 @@ import re
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
+from schema_processor import execute_context_call
+
 # region CONSTANTS
 CODE_RESPONSE = """
 import requests
@@ -75,32 +77,34 @@ def dump_empty(output_file, paths_hash):
         file.write(json.dumps({"hash": paths_hash, "questions": []}) + "\n")
 
 
-def dump_data(output_file, paths_hash, multi_stage_questions, single_stage_questions):
+def dump_data(output_file, paths_hash, multi_stage_questions, single_stage_questions, simulated_conversations):
     with open(output_file, "a") as file:
-        file.write(
-            json.dumps(
-                {
-                    "hash": paths_hash,
-                    "questions": multi_stage_questions,
-                    "single_stage_questions": single_stage_questions,
-                }
+        for convo in simulated_conversations:
+            file.write(
+                json.dumps(
+                    {
+                    "messages": convo
+                    } 
+                )+ "\n"
             )
-            + "\n"
-        )
 
 
 def format_questions_response(input_str, output_file, paths_hash):
     # Split the input string into lines
-    lines = input_str.split("\n")
     questions = []
-    for line in lines:
-        # Check if the line is a question (does not contain "No match")
-        if not line:
-            continue
-        if "Question" not in line:
-            continue
-        questions.append(line)
-    return questions
+    try:
+        lines = input_str.split("\n")
+        
+        for line in lines:
+            # Check if the line is a question (does not contain "No match")
+            if not line:
+                continue
+            if "Question" not in line:
+                continue
+            questions.append(line)
+        return questions
+    except Exception as exc:
+        print(exc)
 
 
 def extract_resource_name(path):
@@ -116,7 +120,13 @@ def prompt_llama(messages: list, llm):
     # Generate a response from the model
     answer = ""
     try:
-        answer = llm.create_chat_completion(messages=messages)
+        answer = llm.create_chat_completion(
+            messages=messages,
+            temperature=0.0,
+            top_p=1.0,
+            repeat_penalty=1.0,
+            top_k=1,
+        )
     except Exception as exc:
         print(exc)
         return answer
@@ -217,22 +227,6 @@ def single_stage_questioning(first_context, llm):
     return llm_response
 
 
-def execute_context_call(full_schema_context, context_call):
-    """Executes the context call and returns the schema for the requested endpoint."""
-    # Extract the endpoint path from the context call
-    pattern = r"get_context\('(.*?)'\)"
-    match = re.search(pattern, context_call)
-    if not match:
-        return "No match found."
-    endpoint_path = match.group(1)
-
-    # Get the schema for the requested endpoint
-    schema = full_schema_context.get(endpoint_path)
-    if not schema:
-        return "No schema found for the endpoint."
-    return schema
-
-
 def extract_context(llm_response):
     """Extracts the context from the LLM response."""
     # Regex pattern to match the function call
@@ -258,6 +252,7 @@ def extract_code_placeholder_questions(llm_response):
     These questions need to be answered by the end-user to replace the placeholders and make the code functional.
     """
     # Regex pattern to match the placeholders in the code
+    llm_response = llm_response.replace('\n', ' ')
     pattern = r'"{(.*?)}"'
 
     # Search for the pattern in the input string
@@ -280,13 +275,18 @@ def extract_simulated_answers(llm_response):
     # Regex pattern to match the simulated answers
     # first strip out line breaks and encodings
     pattern = r"Answer \d+: (.*)"
+    other_pattern = r"A\d+: (.*)"
 
     # Search for the pattern in the input string
     matches = re.findall(pattern, llm_response)
+    other_matches = re.findall(pattern=other_pattern, string=llm_response)
     answers = []
     # If matches are found, extract the simulated answers
     if matches:
         for match in matches:
+            answers.append(match)
+    elif other_matches:
+        for match in other_matches:
             answers.append(match)
     else:
         print("No simulated answers found.")
@@ -300,10 +300,13 @@ def extract_amended_code(llm_response):
     """
     # Regex pattern to match the amended code
     # find the first occurrence of "Amended code:"
-    pattern = r"Amended code:(.*)"
-    index = llm_response.find("Amended code:")
-    amended_code = llm_response[index + len("Amended code:") :]
-    return amended_code
+    try:
+        pattern = r"Amended code:(.*)"
+        index = llm_response.find("Amended code:")
+        amended_code = llm_response[index + len("Amended code:") :]
+        return amended_code
+    except:
+        return None
 
 
 def extract_simulated_data_parts(response):
@@ -333,7 +336,7 @@ def simulate_code_reasoning(answer: str, llm):
         {"role": "user", "content": answer},
     ]
     answer = prompt_llama(messages=messages, llm=llm)
-    questions = extract_code_placeholder_questions(answer)
+    questions = extract_code_placeholder_questions(answer.get('content'))
     print(questions)
     if not questions:
         return return_messages
@@ -358,6 +361,8 @@ def simulate_code_reasoning(answer: str, llm):
     return_messages.append({"role": "assistant", "content": str(simulated_answers)})
 
     amended_code = extract_amended_code(response)
+    if not amended_code:
+        return []
     messages.append({"role": "assistant", "content": amended_code})
     return_messages.append({"role": "assistant", "content": amended_code})
 
@@ -402,72 +407,74 @@ def conversation_simulation(
 def generate_multi_stage_conversations(
     multi_stage_questions, full_path_context, system_context, llm
 ):
-    multi_stage_questions = []
-    for question in multi_stage_questions:
-        user_question = question.split("Question: ")[1]
-        full_messages = []
-        messages = [
-            {"role": "system", "content": system_context},
-            {"role": "user", "content": user_question},
-        ]
-        answer = prompt_llama(messages=messages, llm=llm)
-        if not answer:
-            print("Decide")
-            continue
-        answer = answer["content"]
-        context_call = extract_context(answer)
-        if not context_call:
-            continue
-        messages.append({"role": "context_layer", "content": context_call})
-        schema = execute_context_call(
-            full_schema_context=full_path_context, context_call=context_call
-        )
-        if schema == "No match found.":
-            continue
-        messages.append({"role": "assistant", "content": schema})
-        answer = prompt_llama(messages=messages, llm=llm)
-        if answer == "":
-            continue
-        answer = answer["content"]
-        full_messages.append(messages)
+    try:
+        multi_question_responses = []
+        for question in multi_stage_questions or []:
+            if not question:
+                continue
+            user_question = question.split("Question: ")[1]
+            full_messages = []
+            messages = [
+                {"role": "system", "content": system_context},
+                {"role": "user", "content": user_question},
+            ]
+            answer = prompt_llama(messages=messages, llm=llm)
+            if not answer:
+                print("Decide")
+                continue
+            answer = answer["content"]
+            messages.append({"role": "assistant", "content": answer})
+            schema = execute_context_call(
+                full_schema_context=full_path_context, context_call=answer
+            )
+            if not schema:
+                continue
+            messages.append({"role": "assistant", "content": schema})
+            answer = prompt_llama(messages=messages, llm=llm)
+            if answer == "":
+                continue
+            answer = answer["content"]
+            full_messages.append(messages)
 
-        messages.extend(simulate_code_reasoning(answer=answer, llm=llm))
-        multi_stage_questions.append(full_messages)
-    return multi_stage_questions
+            messages.extend(simulate_code_reasoning(answer=answer, llm=llm))
+            multi_question_responses.extend(full_messages)
+        return multi_question_responses
+    except Exception as exc:
+        print(exc)
 
 
 def generate_single_stage_conversation(
     single_stage_questions, full_path_context, system_context, llm
 ):
-    single_stage_questions = []
-    for question in single_stage_questions:
-        user_question = question.split("Question: ")[1]
-        full_messages = []
-        messages = [
-            {"role": "system", "content": system_context},
-            {"role": "user", "content": user_question},
-        ]
-        answer = prompt_llama(messages=messages, llm=llm)
-        if not answer:
-            continue
-        answer = answer["content"]
-        context_call = extract_context(answer)
-        if not context_call:
-            continue
-        messages.append({"role": "context_layer", "content": context_call})
-        schema = execute_context_call(
-            full_schema_context=full_path_context, context_call=context_call
-        )
-        if schema == "No match found.":
-            continue
-        messages.append({"role": "assistant", "content": schema})
-        answer = prompt_llama(messages=messages, llm=llm)
-        if answer == "":
-            continue
-        answer = answer["content"]
-        full_messages.append(messages)
-        single_stage_questions.append(full_messages)
-    return single_stage_questions
+    try:
+        single_stage_responses = []
+        for question in single_stage_questions or []:
+            user_question = question.split("Question: ")[1]
+            full_messages = []
+            messages = [
+                {"role": "system", "content": system_context},
+                {"role": "user", "content": user_question},
+            ]
+            answer = prompt_llama(messages=messages, llm=llm)
+            if not answer:
+                continue
+            answer = answer["content"]
+            messages.append({"role": "assistant", "content": answer})
+            schema = execute_context_call(
+                full_schema_context=full_path_context, context_call=answer
+            )
+            if schema == "No match found.":
+                continue
+            messages.append({"role": "assistant", "content": schema})
+            answer = prompt_llama(messages=messages, llm=llm)
+            if answer == "":
+                continue
+            answer = answer["content"]
+            full_messages.append(messages)
+            single_stage_responses.extend(full_messages)
+        return single_stage_responses
+    except Exception as exc:
+        print(exc)
 
 
 def download_gguf_model(

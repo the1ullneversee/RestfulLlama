@@ -7,3 +7,11 @@ notebooks/
 *.pyd
 *.gguf
 /models/
+llama.cpp/
+model/
+outputs/
+wandb/
+data_generation/broken_files/
+data_generation/data/
+data_generation/input/
+data_generation/processed_files/
