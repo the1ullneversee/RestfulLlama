@@ -2,7 +2,6 @@ import copy
 import json
 import sys
 
-import llama_cpp
 import structlog
 from openai import OpenAI
 
@@ -12,6 +11,7 @@ from data_generation.schema_processor import (
     execute_context_call,
     parse_file,
 )
+from model_converser import load_language_model
 
 logger = structlog.get_logger()
 
@@ -22,38 +22,6 @@ repo_name = "the1ullneversee"
 model_name = "RestfulLlama-8B-Instruct"
 local_model_path = final_model_path + model_name
 client = OpenAI(base_url="http://172.29.0.1:1234/v1", api_key="lm-studio")
-if use_llama:
-    llm = llama_cpp.Llama.from_pretrained(
-        repo_id=f"{repo_name}/{model_name}",
-        filename="restful_llama_8_Q8.gguf",
-        n_threads=16,  # CPU cores
-        n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-        n_gpu_layers=-1,  # Change this value based on your model and your GPU VRAM pool.
-        n_ctx=8096,  # Context window
-        verbose=True,
-    )
-
-
-def validate_context_call(context_message, question_metadata):
-    if "get_context" in context_message["content"]:
-        # validate the context call
-        for target_context_call in question_metadata["target_context_calls"]:
-            if target_context_call in context_message["content"]:
-                return True
-    return False
-
-
-def validate_code_generation(code_message, question_metadata):
-    # First we can check the parameters used, and if they are correct
-    # Then we can check the code generated
-    gen_code = code_message.get("content")
-    gen_params = gen_code.find("params")
-    if gen_params == -1:
-        print("Error: Parameters not found in the code")
-        return False
-    params = gen_code[gen_params:]
-    question_metadata["parameters"]
-    code_message
 
 
 def save_response(history, question_metadata, context_type, model_name):
@@ -75,7 +43,6 @@ def prompt_openai(history, model_name):
             temperature=0.7,
             stream=True,
         )
-
         for chunk in completion:
             if chunk.choices[0].delta.content:
                 print(chunk.choices[0].delta.content, end="", flush=True)
@@ -85,14 +52,14 @@ def prompt_openai(history, model_name):
     return new_message
 
 
-def prompt_llm_cpp(history):
+def prompt_llm_cpp(llm, history):
     answer = llm.create_chat_completion(messages=history)
     return answer.get("choices")[0].get("message")
 
 
-def prompt_llm(history, use_llama, model_name):
+def prompt_llm(history, use_llama, model_name, llm):
     if use_llama:
-        return prompt_llm_cpp(history)
+        return prompt_llm_cpp(llm, history)
     else:
         return prompt_openai(history, model_name)
 
@@ -128,9 +95,15 @@ all_system_contexts = {
     "limited_schema_context": limited_schema_context,
 }
 
-if __name__ == "__main__":
-    # open directory and read the files
-    input_file = "evaluation/evaluation_data/API_docs.json"
+
+def generate_schema_info(
+    logger,
+    whole_context,
+    partial_schema_context,
+    limited_schema_context,
+    all_system_contexts,
+    input_file,
+):
     with open(input_file) as f:
         logger.info("Reading Evaluation File")
         try:
@@ -153,9 +126,10 @@ if __name__ == "__main__":
             )
         except Exception as e:
             logger.error("Error: Invalid JSON file")
+    return api_information, full_schema_context
 
-        # Chat with an intelligent assistant in your terminal
 
+def construct_evaluation_metadata(api_information):
     questions_to_metadata = {}
     questions_to_metadata = [
         {
@@ -298,6 +272,23 @@ if __name__ == "__main__":
         },
     ]
 
+    return questions_to_metadata
+
+
+async def eval_runner(llm):
+    # open directory and read the files
+    input_file = "evaluation/evaluation_data/API_docs.json"
+    api_information, full_schema_context = generate_schema_info(
+        logger,
+        whole_context,
+        partial_schema_context,
+        limited_schema_context,
+        all_system_contexts,
+        input_file,
+    )
+
+    questions_to_metadata = construct_evaluation_metadata(api_information)
+
     for question_metadata in questions_to_metadata:
         for context_type, system_context in all_system_contexts.items():
             history = [
@@ -307,8 +298,7 @@ if __name__ == "__main__":
             question = convo.pop(0)
             logger.info("Question: {}, Context Type: {}".format(question, context_type))
             history.append({"role": "user", "content": question})
-            answer = prompt_llm(history, use_llama, model_name)
-            context_stage = True
+            answer = prompt_llm(history, use_llama, model_name, llm)
             context_stage_count = 0
             while True:
                 new_message = answer
@@ -350,3 +340,7 @@ if __name__ == "__main__":
                 if answer.get("content") == "" or context_stage_count > 5:
                     save_response(history, question_metadata, context_type, model_name)
                     break
+
+
+if __name__ == "main":
+    llm = load_language_model()
