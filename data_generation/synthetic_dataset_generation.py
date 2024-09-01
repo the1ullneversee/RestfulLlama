@@ -8,24 +8,22 @@ import zipfile
 import llama_cpp
 import requests
 import structlog
-from helper import (
+from .helper import (
     conversation_simulation,
     create_path_hash,
     dump_data,
     extract_resource_name,
     format_questions_response,
-    get_questions,
-    load_language_model,
     multi_stage_questioning,
     single_stage_questioning,
 )
-from schema_processor import (
+from .schema_processor import (
     APIInfo,
     _generate_full_path_context,
     _generate_path_to_response,
     parse_file,
 )
-from transformers import AutoTokenizer
+from shared.helper_funcs import load_language_model
 
 logger = structlog.get_logger()
 

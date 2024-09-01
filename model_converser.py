@@ -13,6 +13,8 @@ from colorama import Fore
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
+from shared.helper_funcs import load_language_model
+
 logging.basicConfig(level=logging.CRITICAL)
 logger = logging.getLogger(__name__)
 
@@ -35,46 +37,6 @@ max_seq_length = 2048  # Supports RoPE Scaling interally, so choose any!
 llm_ctx_window = 8096
 # 10% less than the max context window
 llm_ctx_window_warning = llm_ctx_window - (llm_ctx_window * 0.1)
-
-
-def download_gguf_model(local_dir="./models"):
-    try:
-        # Create the local directory if it doesn't exist
-        os.makedirs(local_dir, exist_ok=True)
-
-        # Download the file
-        model_path = hf_hub_download(
-            repo_id=repo_name + "/" + model_name,
-            filename=file_name,
-            local_dir=local_dir,
-            local_dir_use_symlinks=False,
-        )
-
-        print(f"Model downloaded successfully to: {model_path}")
-        return model_path
-
-    except Exception as e:
-        print(f"An error occurred while downloading the model: {e}")
-        return None
-
-
-async def load_language_model() -> None:
-    def _load_model():
-        model_path = download_gguf_model()
-        return Llama(
-            model_path=model_path,
-            # model_path="./models/restful_llama_8_Q8.gguf",
-            n_threads=8,  # CPU cores
-            n_batch=512,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-            n_gpu_layers=-1,  # Change this value based on your model and your GPU VRAM pool.
-            n_ctx=8096,  # Context window
-            verbose=False,
-        )
-
-    # Run the CPU-bound model loading in a thread pool
-    llm = await asyncio.to_thread(_load_model)
-    return llm
-
 
 def stream_output(
     output_text: str, colour: str | None = None, output_cadence: float = 0.02
@@ -225,7 +187,14 @@ def _conversation_loop(llm: Llama, api_docs_file: str) -> None:
 async def inference() -> None:
     console_clear = "\033[H\033[J"
     print(console_clear)
-    model_task = asyncio.create_task(load_language_model())
+
+    local_dir = "./models/"
+    model_task = asyncio.create_task(load_language_model(
+        local_dir=local_dir,
+        repo_name=repo_name,
+        model_name=model_name,
+        file_name=file_name,
+    ))
 
     welcome_text = (
         "Welcome to RestfulLlama Inference!"

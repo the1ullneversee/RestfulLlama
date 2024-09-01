@@ -1,7 +1,5 @@
 import asyncio
-import random
 import sys
-import time
 
 import torch
 from colorama import Fore
@@ -10,22 +8,7 @@ from data_generation.synthetic_dataset_generation import generation_main
 from fine_tuning.fine_tuner import fine_tune_model
 from llm_evaluator import eval_runner
 from model_converser import inference
-
-
-def stream_output(
-    output_text: str, colour: str | None = None, output_cadence: float = 0.02
-) -> None:
-    if colour:
-        sys.stdout.write(colour)
-    else:
-        sys.stdout.write(
-            random.choice([Fore.CYAN, Fore.GREEN, Fore.MAGENTA, Fore.YELLOW])
-        )
-    for char in output_text:
-        sys.stdout.write(char)
-        sys.stdout.flush()
-        time.sleep(output_cadence)
-    print()
+from shared.helper_funcs import stream_output
 
 
 def get_gpu_info():

@@ -1,7 +1,9 @@
 import copy
 import json
+import os
 import sys
 
+from colorama import Fore
 import structlog
 from openai import OpenAI
 
@@ -11,16 +13,16 @@ from data_generation.schema_processor import (
     execute_context_call,
     parse_file,
 )
+from shared.helper_funcs import stream_output
 from model_converser import load_language_model
 
 logger = structlog.get_logger()
 
-final_model_path = "./models/final/"
-
 use_llama = True
 repo_name = "the1ullneversee"
 model_name = "RestfulLlama-8B-Instruct"
-local_model_path = final_model_path + model_name
+file_name = "restful_llama_8_Q8.gguf"
+
 client = OpenAI(base_url="http://172.29.0.1:1234/v1", api_key="lm-studio")
 
 
@@ -275,9 +277,22 @@ def construct_evaluation_metadata(api_information):
     return questions_to_metadata
 
 
-async def eval_runner(llm):
+async def eval_runner():
+    console_clear = "\033[H\033[J"
+    print(console_clear)
+    stream_output("Starting Evaluation...")
+    local_dir = "./models/"
+    llm = await load_language_model(
+        local_dir=local_dir,
+        repo_name=repo_name,
+        model_name=model_name,
+        file_name=file_name,
+    )
     # open directory and read the files
-    input_file = "evaluation/evaluation_data/API_docs.json"
+    input_file = "./evaluation/evaluation_data/API_docs.json"
+    if not os.path.exists(input_file):
+        stream_output("Critical: Evaluation file not found", Fore.RED)
+        return
     api_information, full_schema_context = generate_schema_info(
         logger,
         whole_context,
@@ -336,11 +351,7 @@ async def eval_runner(llm):
                 print(json.dumps(history, indent=2))
                 print(f"\n{'-'*55}\n{reset_color}")
 
-                answer = prompt_llm(history, use_llama, model_name)
+                answer = prompt_llm(history, use_llama, model_name, llm)
                 if answer.get("content") == "" or context_stage_count > 5:
                     save_response(history, question_metadata, context_type, model_name)
                     break
-
-
-if __name__ == "main":
-    llm = load_language_model()
